@@ -34,6 +34,8 @@ getLogFileSubset <- function(logfile, par) {
 }
 
 
+#' Calculate HPD of a parameter
+#'
 #' Get HPD of a posterior sample
 #'
 #' Uses Chen and Shao algorithm as implemented in boa package.
@@ -57,6 +59,8 @@ getHPD <- function(data, alpha=0.05, includeMedian=TRUE) {
 }
 
 
+#' Calculate HPD of a set of parameters
+#'
 #' Get HPD of a matrix of values e.g. a skyline
 #'
 #' Uses Chen and Shao algorithm as implemented in boa package.
@@ -81,7 +85,17 @@ getMatrixHPD <- function(data, margin=2, dataframe=TRUE, ...) {
 }
 
 
-function (x)
-{
-  cor(as.matrix(x))
+#' Calculate pairwise correlations between parameters
+#'
+#' Returns a matrix with the pairwise correlations between pairs of parameters.
+#' This function is similar to \code{coda::corsscorr}, but unlike the
+#' \code{coda} function other parameters can be passed to the correlation
+#' function (so spearman or pearson correlation coefficients can be
+#' calculated).
+#'
+#' @param data Data frame or matrix of the posterior samples of parameters.
+#'   If data is a matrix, samples are rows and parameters are columns.
+#'
+pairwiseCorrelations <- function(data, ...) {
+  return (cor(as.matrix(data, ...)))
 }

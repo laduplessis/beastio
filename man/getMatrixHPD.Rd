@@ -2,7 +2,7 @@
 % Please edit documentation in R/log_utils.R
 \name{getMatrixHPD}
 \alias{getMatrixHPD}
-\title{Get HPD of a matrix of values e.g. a skyline}
+\title{Calculate HPD of a set of parameters}
 \usage{
 getMatrixHPD(data, margin = 2, dataframe = TRUE, ...)
 }
@@ -22,5 +22,8 @@ the posterior and each column a parameter.}
         each parameter in turn.
 }
 \description{
+Get HPD of a matrix of values e.g. a skyline
+}
+\details{
 Uses Chen and Shao algorithm as implemented in boa package.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/log_utils.R
 \name{getHPD}
 \alias{getHPD}
-\title{Get HPD of a posterior sample}
+\title{Calculate HPD of a parameter}
 \usage{
 getHPD(data, alpha = 0.05, includeMedian = TRUE)
 }
@@ -17,5 +17,8 @@ getHPD(data, alpha = 0.05, includeMedian = TRUE)
 c(lower, median, upper)
 }
 \description{
+Get HPD of a posterior sample
+}
+\details{
 Uses Chen and Shao algorithm as implemented in boa package.
 }
