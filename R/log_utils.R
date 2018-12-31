@@ -2,6 +2,9 @@
 # Utilities for reading BEAST logfiles and getting HPDs
 #
 # TODO: Port functions in the ESS class of BEAST2 to calculate convergence statistics
+#
+# TODO: Should coda be used instead of boa?
+
 
 #' Read in BEAST logfile
 #'
@@ -25,7 +28,7 @@ readLogfile <- function(filename, burnin=0.1, maxsamples=-1) {
 #'
 #' if par="R0" extract (R0s.1 R0s.2 R0s.3 etc.)
 #'
-#' @par The string to match with the start of the parameters to extract.
+#' @param par The string to match with the start of the parameters to extract.
 #' @return A number of parameters from the logfile that match "^<par>"
 #'
 #' @export

@@ -6,6 +6,9 @@
 \usage{
 getLogFileSubset(logfile, par)
 }
+\arguments{
+\item{par}{The string to match with the start of the parameters to extract.}
+}
 \value{
 A number of parameters from the logfile that match "^<par>"
 }
