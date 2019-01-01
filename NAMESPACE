@@ -3,5 +3,7 @@
 export(getHPD)
 export(getLogFileSubset)
 export(getMatrixHPD)
+export(getMonths)
+export(getWeeks)
 export(readLogfile)
 export(readTreefile)
