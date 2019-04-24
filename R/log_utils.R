@@ -24,6 +24,16 @@ readLogfile <- function(filename, burnin=0.1, maxsamples=-1) {
 }
 
 
+
+toCoda <- function(lf) {
+
+  start <- lf$Sample[1]
+  thin  <- lf$Sample[2]-lf$sample[1]
+  rownames(lf) <- lf$Sample
+
+  return(coda::mcmc(lf, start=start, thin=thin))
+}
+
 #' Extract all matching parameters from the logfile
 #'
 #' if par="R0" extract (R0s.1 R0s.2 R0s.3 etc.)

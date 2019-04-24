@@ -3,7 +3,8 @@
 #' This function will return all the months between \code{from} and \code{to}.
 #' The dates in the sequence are the first day of each month.
 #'
-#' @param from,to Start and end of the date seq
+#' @param from,to Start and end of the date sequence (these should be date
+#'   objects).
 #' @param floorFrom If TRUE the first element in the sequence is the start of
 #'   the first month before \code{from}, otherwise \code{from}.
 #' @param ceilTo If TRUE the last element in the sequence is the start of
@@ -35,7 +36,8 @@ getMonths <- function(from, to, floorFrom=TRUE, ceilTo=TRUE) {
 #' The dates in the sequence are the first day of each week.
 #' The first day of the week can be set using the \code{week_start} parameter.
 #'
-#' @param from,to Start and end of the date seq
+#' @param from,to Start and end of the date sequence (these should be date
+#'   objects).
 #' @param week_start Specify the week start, default is Sunday (7)
 #' @param floorFrom If TRUE the first element in the sequence is the start of
 #'   the first month before \code{from}, otherwise \code{from}.
