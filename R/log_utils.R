@@ -15,7 +15,7 @@
 #'        (this option is only for testing and should generally not be used).
 #' @param as.mcmc If FALSE then return a data.frame, otherwise return an mcmc object
 #'
-read.log.single <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
+readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
   if (burnin > 1) {
       stop("Error: Burnin must be a proportion of samples between 0 and 1.")
   }
@@ -47,15 +47,15 @@ read.log.single <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
 #' @param as.mcmc If FALSE then return a data.frame, otherwise return an mcmc object
 #'
 #' @export
-read.log <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
+readLog <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
 
   if (length(filenames) == 1) {
-      return( read.log.single(filenames, burnin, maxsamples, as.mcmc) )
+      return( readSingleLog(filenames, burnin, maxsamples, as.mcmc) )
   } else {
 
       loglist <- list()
       for (filename in filenames) {
-          loglist[[filename]] <- read.log.single(filename, burnin, maxsamples, as.mcmc)
+          loglist[[filename]] <- readSingleLog(filename, burnin, maxsamples, as.mcmc)
       }
 
       if (as.mcmc == TRUE) {
@@ -70,15 +70,43 @@ read.log <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
 
 
 #' Extract all matching parameters from the logfile
+#' The object returned is always in the same format as logfile
+#' (mcmc, mcmc.list, data.frame, or list<data.frame>)
 #'
-#' if par="R0" extract (R0s.1 R0s.2 R0s.3 etc.)
+#' e.g if par="R0" extract (R0s.1 R0s.2 R0s.3 etc.)
 #'
-#' @param par The string to match with the start of the parameters to extract.
-#' @return A number of parameters from the logfile that match "^<par>"
+#' @param logfile The logfile object to subset
+#' @param pattern The string to match with the start of the parameters to extract. Can be a regular expression
+#' @param start   If TRUE then only the start of parameters are matched against pattern (pattern becomes "^<pattern>")
+#' @return A logfile object with only those parameters that match pattern
 #'
 #' @export
-getLogFileSubset <- function(logfile, par) {
-  return(logfile[grepl(paste0('^',par), names(logfile))])
+getLogFileSubset <- function(logfile, pattern, start=TRUE) {
+  if (start == TRUE) {
+      pattern <- paste0("^",pattern)
+  }
+
+  if (is.mcmc(logfile) || is.mcmc.list(logfile)) {
+      return(logfile[, grepl(pattern, varnames(logfile)), drop=TRUE])
+  } else {
+
+      if (is.data.frame(logfile)) {
+
+        # Single data frame
+        return(logfile[, grepl(pattern, names(logfile)), drop=TRUE])
+      } else {
+
+        # List of data frames
+        result <- list()
+        for (chain in names(logfile)) {
+            result[[chain]] <- logfile[[chain]][, grepl(pattern, names(logfile[[chain]])), drop=TRUE]
+        }
+        return(result)
+      }
+  }
+
+
+  #return(logfile[, grepl(paste0('^',par), names(logfile))])
 }
 
 
