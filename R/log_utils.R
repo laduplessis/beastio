@@ -2,37 +2,72 @@
 # Utilities for reading BEAST logfiles and getting HPDs
 #
 # TODO: Port functions in the ESS class of BEAST2 to calculate convergence statistics
+#       -> No, use coda instead and ignore the BEAST/BEAST2 functions
 #
-# TODO: Should coda be used instead of boa?
+# TODO: Replace boa functions completely with coda functions
 
 
-#' Read in BEAST logfile
+#' Read in a single BEAST logfile and return as a coda mcmc object
 #'
 #' @param filename The logfile.
 #' @param burnin Discard this proportion of samples at the start of the chain.
 #' @param maxamples If > 0 stop after reading in this many lines
 #'        (this option is only for testing and should generally not be used).
+#' @param as.mcmc If FALSE then return a data.frame, otherwise return an mcmc object
 #'
-#' @export
-readLogfile <- function(filename, burnin=0.1, maxsamples=-1) {
+read.log.single <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
   if (burnin > 1) {
       stop("Error: Burnin must be a proportion of samples between 0 and 1.")
   }
+
   logfile <- read.table(filename, sep="\t", header=TRUE, nrows=maxsamples)
   n <- nrow(logfile)
-  return(logfile[floor(burnin*n):n,])
+  logfile <- logfile[floor(burnin*n):n,]
+
+  if (as.mcmc == TRUE) {
+      start <- logfile$Sample[1]
+      thin  <- logfile$Sample[2]-logfile$Sample[1]
+      rownames(logfile) <- logfile$Sample
+      logfile$Sample    <- NULL
+
+      return(coda::mcmc(logfile, start=start, thin=thin))
+  } else {
+      return(logfile)
+  }
+}
+
+#' Read in a single BEAST logfile and return as a coda mcmc object.
+#' If filenames contains more than one entry each log file is added as a separate chain and
+#' a coda mcmc.list object is returned
+#'
+#' @param filename The logfile.
+#' @param burnin Discard this proportion of samples at the start of the chain.
+#' @param maxamples If > 0 stop after reading in this many lines
+#'        (this option is only for testing and should generally not be used).
+#' @param as.mcmc If FALSE then return a data.frame, otherwise return an mcmc object
+#'
+#' @export
+read.log <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
+
+  if (length(filenames) == 1) {
+      return( read.log.single(filenames, burnin, maxsamples, as.mcmc) )
+  } else {
+
+      loglist <- list()
+      for (filename in filenames) {
+          loglist[[filename]] <- read.log.single(filename, burnin, maxsamples, as.mcmc)
+      }
+
+      if (as.mcmc == TRUE) {
+          return (mcmc.list(loglist))
+      } else {
+          return (loglist)
+      }
+  }
+
 }
 
 
-
-toCoda <- function(lf) {
-
-  start <- lf$Sample[1]
-  thin  <- lf$Sample[2]-lf$sample[1]
-  rownames(lf) <- lf$Sample
-
-  return(coda::mcmc(lf, start=start, thin=thin))
-}
 
 #' Extract all matching parameters from the logfile
 #'
@@ -111,4 +146,68 @@ getMatrixHPD <- function(data, margin=2, dataframe=TRUE, ...) {
 #'
 pairwiseCorrelations <- function(data, ...) {
   return (cor(as.matrix(data, ...)))
+}
+
+
+plotPairwiseCorrelations <- function(data, ...) {
+
+  ## put histograms on the diagonal
+  panel.hist <- function(x, ...) {
+    usr <- par("usr")
+    on.exit(par(usr))
+
+    par(usr = c(usr[1:2], 0, 1.5) )
+    h <- hist(x, plot = FALSE, breaks=20)
+    breaks <- h$breaks
+    nB <- length(breaks)
+
+    y <- h$counts
+    y <- y/max(y)
+    #rect(breaks[-nB], 0, breaks[-1], y, col = "cyan", ...)
+    rect(breaks[-nB], 0, breaks[-1], y, col=pal.dark(cblue,0.5), border=pal.dark(cblue))
+  }
+
+
+  ## put correlations on the upper panels,
+  ## with size proportional to the correlations.
+  panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...) {
+    usr <- par("usr")
+    on.exit(par(usr))
+
+    par(usr = c(0, 1, 0, 1))
+    r <- cor(x, y)
+    if (abs(r) < 0.5) {
+      col <- pal.dark(cblue)
+    } else
+      if (abs(r) < 0.75) {
+        col <- pal.dark(corange)
+      } else {
+        col <- pal.dark(cred)
+      }
+    txt <- format(c(r, 0.123456789), digits = digits)[1]
+    txt <- paste0(prefix, txt)
+
+    if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+    text(0.5, 0.5, txt, cex = cex.cor * r, col = col, font = 2)
+  }
+
+
+  panel.scatter <- function(x,y, alpha=0.2, ... ) {
+
+    r <- cor(x,y)
+    if (abs(r) < 0.5) {
+      col <- pal.dark(cblue)
+    } else
+      if (abs(r) < 0.75) {
+        col <- pal.dark(corange)
+      } else {
+        col <- pal.dark(cred)
+      }
+    panel.smooth(x, y, col = col, col.smooth = pal.dark(cred), ...)
+  }
+
+  data <- as.matrix(data)
+  pairs(data, panel = panel.scatter, diag.panel = panel.hist, lower.panel = panel.cor,
+        cex = 1.2, pch = 20, cex.labels = 1, font.labels = 2, labels=colnames(data), ...)
+
 }
