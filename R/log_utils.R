@@ -81,7 +81,7 @@ readLog <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
 #' @return A logfile object with only those parameters that match pattern
 #'
 #' @export
-getLogFileSubset <- function(logfile, pattern, start=TRUE) {
+getLogFileSubset <- function(logfile, pattern, start=FALSE) {
   if (start == TRUE) {
       pattern <- paste0("^",pattern)
   }
@@ -104,9 +104,69 @@ getLogFileSubset <- function(logfile, pattern, start=TRUE) {
         return(result)
       }
   }
-
-
   #return(logfile[, grepl(paste0('^',par), names(logfile))])
+}
+
+
+#' Apply a function to an mcmc or mcmc.list object, e.g. median
+#'
+#' @param data The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
+#' @param fun  The function to apply to the MCMC sample, by default median
+#' @param ...  Extra parameters to be passed to the function
+#'
+#' @export
+applyMCMC <- function(data, fun=median, ...) {
+
+  applySingleMCMC <- function(data) { apply(data, 2, fun, ...) }
+
+  if (is.mcmc(data)) {
+    return(applySingleMCMC(data))
+  } else
+  if (is.mcmc.list(data)) {
+
+    result <- list()
+    for (chain in chanames(data)) {
+      result[[chain]] <- applySingleMCMC(data[[chain]])
+    }
+    return(result)
+
+  } else {
+    stop("Error: Not an mcmc or mcmc.list object")
+  }
+
+}
+
+#' Calculate the HPD interval and median and return in a single object
+#' Only works for mcmc and mcmc.list objects
+#'
+#' @param data The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
+#' @param prob Target probability content for the HPD interval (see ?HPDinterval)
+#' @param ...  Extra parameters to be passed to the median function
+#'
+#' @export
+getHPDMedian <- function(data, prob=0.95, ...) {
+
+  hpd <- HPDinterval(data, prob=prob)
+  med <- applyMCMC(data, median, ...)
+
+  pasteAndReorder <- function(shpd, smed) { cbind(shpd, smed)[,c(1,3,2)] }
+
+
+  if (is.mcmc(data)) {
+    return( pasteAndReorder(hpd, med) )
+  } else
+  if (is.mcmc.list(data)) {
+
+    result <- list()
+    for (chain in chanames(data)) {
+      result[[chain]] <- pasteAndReorder(hpd[[chain]], med[[chain]])
+    }
+    return(result)
+
+  } else {
+    stop("Error: Not an mcmc or mcmc.list object")
+  }
+
 }
 
 
@@ -122,7 +182,7 @@ getLogFileSubset <- function(logfile, pattern, start=TRUE) {
 #' @return c(lower, median, upper)
 #'
 #' @export
-getHPD <- function(data, alpha=0.05, includeMedian=TRUE) {
+getHPD.boa <- function(data, alpha=0.05, includeMedian=TRUE) {
   hpd <- boa::boa.hpd(data, alpha)
   if (includeMedian) {
     med <- median(data)
@@ -151,7 +211,7 @@ getHPD <- function(data, alpha=0.05, includeMedian=TRUE) {
 #'         each parameter in turn.
 #'
 #' @export
-getMatrixHPD <- function(data, margin=2, dataframe=TRUE, ...) {
+getMatrixHPD.boa <- function(data, margin=2, dataframe=TRUE, ...) {
   out <- apply(data, margin, getHPD, ...)
   if (dataframe) {
     return(data.frame(out))

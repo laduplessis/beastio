@@ -8,7 +8,8 @@ getWeeks(from, to, week_start = getOption("lubridate.week.start", 7),
   floorFrom = FALSE, ceilTo = FALSE)
 }
 \arguments{
-\item{from, to}{Start and end of the date seq}
+\item{from, to}{Start and end of the date sequence (these should be date
+objects).}
 
 \item{week_start}{Specify the week start, default is Sunday (7)}
 

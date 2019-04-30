@@ -7,7 +7,8 @@
 getMonths(from, to, floorFrom = TRUE, ceilTo = TRUE)
 }
 \arguments{
-\item{from, to}{Start and end of the date seq}
+\item{from, to}{Start and end of the date sequence (these should be date
+objects).}
 
 \item{floorFrom}{If TRUE the first element in the sequence is the start of
 the first month before \code{from}, otherwise \code{from}.}

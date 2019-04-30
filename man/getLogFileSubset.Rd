@@ -2,16 +2,22 @@
 % Please edit documentation in R/log_utils.R
 \name{getLogFileSubset}
 \alias{getLogFileSubset}
-\title{Extract all matching parameters from the logfile}
+\title{Extract all matching parameters from the logfile
+The object returned is always in the same format as logfile
+(mcmc, mcmc.list, data.frame, or list<data.frame>)}
 \usage{
-getLogFileSubset(logfile, par)
+getLogFileSubset(logfile, pattern, start = FALSE)
 }
 \arguments{
-\item{par}{The string to match with the start of the parameters to extract.}
+\item{logfile}{The logfile object to subset}
+
+\item{pattern}{The string to match with the start of the parameters to extract. Can be a regular expression}
+
+\item{start}{If TRUE then only the start of parameters are matched against pattern (pattern becomes "^<pattern>")}
 }
 \value{
-A number of parameters from the logfile that match "^<par>"
+A logfile object with only those parameters that match pattern
 }
 \description{
-if par="R0" extract (R0s.1 R0s.2 R0s.3 etc.)
+e.g if par="R0" extract (R0s.1 R0s.2 R0s.3 etc.)
 }
