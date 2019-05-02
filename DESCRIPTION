@@ -1,7 +1,7 @@
 Package: beastio
 Type: Package
 Title: Functions for pre- and post-processing of BEAST and BEAST2 files.
-Version: 0.1.0
+Version: 0.2.0
 Author: Louis du Plessis
 Maintainer: Louis du Plessis <louis.duplessis@zoo.ox.ac.uk>
 Description: This package primarily provides a library of functions for reading
@@ -11,7 +11,7 @@ Description: This package primarily provides a library of functions for reading
     creating the input XML files, although it does not provide an interface
     for creating full BEAST or BEAST2 XML input files.
 Imports:
-    boa
+    coda, boa
 License: GPL-3.0
 Encoding: UTF-8
 LazyData: true

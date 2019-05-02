@@ -59,7 +59,7 @@ readLog <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
       }
 
       if (as.mcmc == TRUE) {
-          return (mcmc.list(loglist))
+          return (coda::mcmc.list(loglist))
       } else {
           return (loglist)
       }
@@ -86,7 +86,7 @@ getLogFileSubset <- function(logfile, pattern, start=FALSE) {
       pattern <- paste0("^",pattern)
   }
 
-  if (is.mcmc(logfile) || is.mcmc.list(logfile)) {
+  if (coda::is.mcmc(logfile) || coda::is.mcmc.list(logfile)) {
       return(logfile[, grepl(pattern, varnames(logfile)), drop=TRUE])
   } else {
 
@@ -119,10 +119,10 @@ applyMCMC <- function(data, fun=median, ...) {
 
   applySingleMCMC <- function(data) { apply(data, 2, fun, ...) }
 
-  if (is.mcmc(data)) {
+  if (coda::is.mcmc(data)) {
     return(applySingleMCMC(data))
   } else
-  if (is.mcmc.list(data)) {
+  if (coda::is.mcmc.list(data)) {
 
     result <- list()
     for (chain in chanames(data)) {
@@ -146,20 +146,20 @@ applyMCMC <- function(data, fun=median, ...) {
 #' @export
 getHPDMedian <- function(data, prob=0.95, ...) {
 
-  hpd <- HPDinterval(data, prob=prob)
-  med <- applyMCMC(data, median, ...)
+  t_hpd <- coda::HPDinterval(data, prob=prob)
+  t_med <- applyMCMC(data, median, ...)
 
-  pasteAndReorder <- function(shpd, smed) { cbind(shpd, smed)[,c(1,3,2)] }
+  pasteAndReorder <- function(hpd, med) { cbind(hpd, med)[,c(1,3,2)] }
 
 
-  if (is.mcmc(data)) {
-    return( pasteAndReorder(hpd, med) )
+  if (coda::is.mcmc(data)) {
+    return( pasteAndReorder(t_hpd, t_med) )
   } else
-  if (is.mcmc.list(data)) {
+  if (coda::is.mcmc.list(data)) {
 
     result <- list()
     for (chain in chanames(data)) {
-      result[[chain]] <- pasteAndReorder(hpd[[chain]], med[[chain]])
+      result[[chain]] <- pasteAndReorder(t_hpd[[chain]], t_med[[chain]])
     }
     return(result)
 
