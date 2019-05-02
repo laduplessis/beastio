@@ -4,7 +4,6 @@
 # TODO: Port functions in the ESS class of BEAST2 to calculate convergence statistics
 #       -> No, use coda instead and ignore the BEAST/BEAST2 functions
 #
-# TODO: Replace boa functions completely with coda functions
 
 
 #' Read in a single BEAST logfile and return as a coda mcmc object
@@ -218,6 +217,107 @@ getMatrixHPD.boa <- function(data, margin=2, dataframe=TRUE, ...) {
   } else {
     return(out)
   }
+}
+
+#' Like constantPars, but for a single mcmc object
+#' (private helper function)
+constantParsMCMC <- function(data) {
+
+  if (coda::is.mcmc(data)) {
+
+      result <- c()
+      for (par in varnames(data)) {
+        if (all(data[ ,par, drop=FALSE] == data[1, par])) {
+          result <- c(result, par)
+        }
+      }
+      return(result)
+
+  } else {
+      return(NULL)
+  }
+}
+
+
+#' Identify parameters in the mcmc chain that have not been sampled
+#' i.e. parameters that have stayed constant across all chains
+#'
+#' If some parameters are constant on some chains but not on others
+#' an error is thrown
+#'
+#' @param data The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
+#'
+#' @export
+constantPars <- function(data) {
+
+  if (coda::is.mcmc(data)) {
+      data <- coda::mcmc.list(data)
+  }
+
+  if (coda::is.mcmc.list(data)) {
+
+      result <- constantParsMCMC(data[[1]])
+      if (nchain(data) > 1) {
+          for (i in 2:nchain(data)) {
+              t <- constantParsMCMC(data[[i]])
+
+              if (!all.equal(result,t)) {
+                  stop(paste0("Error: Chain ",i," has a different set of constant parameters to chain 1. Possibly some parameters got stuck because of a poor proposal distribution."))
+              }
+          }
+      }
+      return(result)
+  } else {
+      stop("Error: Not an mcmc or mcmc.list object")
+  }
+}
+
+#' The opposite to constantPars, that is returns all parameters
+#' that have been sampled
+#'
+#' @param data The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
+#'
+#' @export
+sampledPars <- function(data) {
+    return(setdiff(varnames(data), constantPars(data)))
+}
+
+
+
+#' Check if any parameters in an mcmc chain have an ESS value < cutoff
+#' Constant (unsampled) parameters are ignored.
+#'
+#' @param data   The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
+#' @param cutoff The cutoff ESS value (default = 200)
+#' @param value  If value == TRUE the parameters with ESS < cutoff and their ESS values are returned
+#'               If value == FALSE only the column indices of those parameters are returned
+#' @param ignored Parameters in the chain that should be ignored
+#'
+#' @export
+checkESS <- function(data, cutoff = 200, value = TRUE, ignored = c()) {
+
+  data <- as.mcmc(data)
+  if (coda::is.mcmc(data) && !is.list(data)) {
+      data <- data[, setdiff(sampledPars(data), ignored)]
+      ess  <- coda::effectiveSize(data)
+
+      if (value == TRUE) {
+          return(ess[ess < cutoff])
+      } else {
+          return(which(ess < cutoff))
+      }
+  } else {
+    stop("Error: Not an mcmc object")
+  }
+  #result <- lapply(lapply(mcmc.trace[, p], effectiveSize), function(x) x[x < 500])
+}
+
+
+#' Check that all parameters in an mcmc chain have an ESS value >= cutoff
+#'
+#' @export
+checkESSl <- function(data, cutoff = 200, ignored = c()) {
+  return (length(checkESS(data, cutoff, value = FALSE, ignored)) == 0)
 }
 
 
