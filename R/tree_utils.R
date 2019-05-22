@@ -21,3 +21,4 @@ readTreefile <- function(filename, burnin=0.1) {
   n <- length(treesfile)
   return(treesfile[floor(burnin*n):n])
 }
+

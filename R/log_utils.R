@@ -283,6 +283,38 @@ sampledPars <- function(data) {
 }
 
 
+#' Plot barplot of ESS values
+#'
+#' @param data   The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
+#' @param ess    Output of running coda::effectiveSize(data) - this is optional and can be supplied
+#'               to save time
+#' @param cutoff The cutoff ESS value (default = 200)
+#' @param title  Title of the plot (x-label)
+#' @param col
+#'
+#' @export
+plotESS <- function(data, ess=NULL, cutoff=200, title="", col=mPal(dark$blue, 0.5), ...) {
+
+  if (is.null(ess)) {
+      ess <- coda::effectiveSize(data)
+  }
+
+  nonstat      <- which(ess < cutoff)
+  col          <- rep(col, length(ess))
+  col[nonstat] <- mPal(dark$red, 0.5)
+
+  gplots::barplot2(ess, col=col, names.arg=NA, las=1,
+                   ylab="ESS", xlab=title, ...)
+  abline(h=cutoff, lty=2, col=dark$red, lwd=1)
+
+  if (length(nonstat) > 0) {
+    nonstatx <- nonstat*1.2 - 0.5
+    nonstatlab <- paste(names(ess)[nonstat], "=", round(ess[nonstat]))
+    axis(3, at=nonstatx, labels=nonstatlab, pos=cutoff, col.axis=dark$red, lwd=0, las=2, cex.axis=0.8)
+  }
+}
+
+
 
 #' Check if any parameters in an mcmc chain have an ESS value < cutoff
 #' Constant (unsampled) parameters are ignored.
@@ -292,14 +324,20 @@ sampledPars <- function(data) {
 #' @param value  If value == TRUE the parameters with ESS < cutoff and their ESS values are returned
 #'               If value == FALSE only the column indices of those parameters are returned
 #' @param ignored Parameters in the chain that should be ignored
+#' @param plot   If plot == TRUE draw a barplot of the ESS values and mark parameters with ESS < cutoff
+#' @param ...    Extra parameters to be passed to the plotESS() function
 #'
 #' @export
-checkESS <- function(data, cutoff = 200, value = TRUE, ignored = c()) {
+checkESS <- function(data, cutoff = 200, value = TRUE, ignored = c(), plot=FALSE, ...) {
 
   data <- as.mcmc(data)
   if (coda::is.mcmc(data) && !is.list(data)) {
       data <- data[, setdiff(sampledPars(data), ignored)]
       ess  <- coda::effectiveSize(data)
+
+      if (plot == TRUE) {
+          plotESS(data, ess, cutoff = cutoff, ...)
+      }
 
       if (value == TRUE) {
           return(ess[ess < cutoff])
