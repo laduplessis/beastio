@@ -146,7 +146,12 @@ applyMCMC <- function(data, fun=median, ...) {
 getHPDMedian <- function(data, prob=0.95, ...) {
 
   t_hpd <- coda::HPDinterval(data, prob=prob)
-  t_med <- applyMCMC(data, median, ...)
+
+  if (is.null(dim(data))) {
+      t_med <- median(data)
+  } else {
+      t_med <- applyMCMC(data, median, ...)
+  }
 
   pasteAndReorder <- function(hpd, med) { cbind(hpd, med)[,c(1,3,2)] }
 
