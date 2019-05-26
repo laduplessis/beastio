@@ -288,6 +288,38 @@ sampledPars <- function(data) {
 }
 
 
+#' Overwrites coda::effectiveSize
+#' Avoids numerical underflow by scaling parameters so mean is 1 before calculating
+#' the effecive size
+#'
+#' @param data The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
+#' @param normalize If TRUE try to avoid numerical underflow, else just simply call
+#'                  coda::effectiveSize
+#'
+#' @export
+effectiveSize <- function(data, normalize=TRUE) {
+
+  normalizeChain <- function(chain) {
+    scaling <- 1/apply(chain, 2, mean)
+
+    for (i in 1:coda::nvar(data)) {
+      chain[, i] <- scaling[i] * chain[, i]
+    }
+
+    return(chain)
+  }
+
+  if (is.mcmc.list(data)) {
+    data <- lapply(data, normalizeChain)
+
+  } else {
+    data <- normalizeChain(as.mcmc(data))
+  }
+
+  return(coda::effectiveSize(data))
+}
+
+
 #' Plot barplot of ESS values
 #'
 #' @param data   The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
@@ -301,7 +333,7 @@ sampledPars <- function(data) {
 plotESS <- function(data, ess=NULL, cutoff=200, title="", col=mPal(dark$blue, 0.5), ...) {
 
   if (is.null(ess)) {
-      ess <- coda::effectiveSize(data)
+      ess <- effectiveSize(data)
   }
 
   nonstat      <- which(ess < cutoff)
@@ -309,7 +341,8 @@ plotESS <- function(data, ess=NULL, cutoff=200, title="", col=mPal(dark$blue, 0.
   col[nonstat] <- mPal(dark$red, 0.5)
 
   gplots::barplot2(ess, col=col, names.arg=NA, las=1,
-                   ylab="ESS", xlab=title, ...)
+                   ylab="ESS", xlab="", ...)
+  mtext(side=1, text=title, line=1.5, cex.lab=1)
   abline(h=cutoff, lty=2, col=dark$red, lwd=1)
 
   if (length(nonstat) > 0) {
@@ -338,7 +371,7 @@ checkESS <- function(data, cutoff = 200, value = TRUE, ignored = c(), plot=FALSE
   data <- as.mcmc(data)
   if (coda::is.mcmc(data) && !is.list(data)) {
       data <- data[, setdiff(sampledPars(data), ignored)]
-      ess  <- coda::effectiveSize(data)
+      ess  <- effectiveSize(data)
 
       if (plot == TRUE) {
           plotESS(data, ess, cutoff = cutoff, ...)
