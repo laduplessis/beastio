@@ -24,6 +24,10 @@ readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
   logfile <- logfile[floor(burnin*n):n,]
 
   if (as.mcmc == TRUE) {
+      if (is.null(logfile$Sample)) {
+          logfile$Sample <- logfile$state
+          logfile$state  <- NULL
+      }
       start <- logfile$Sample[1]
       thin  <- logfile$Sample[2]-logfile$Sample[1]
       rownames(logfile) <- logfile$Sample
@@ -342,7 +346,7 @@ plotESS <- function(data, ess=NULL, cutoff=200, title="", col=mPal(dark$blue, 0.
 
   gplots::barplot2(ess, col=col, names.arg=NA, las=1,
                    ylab="ESS", xlab="", ...)
-  mtext(side=1, text=title, line=1.5, cex.lab=1)
+  mtext(side=1, text=title, line=1.5, cex.lab=0.8)
   abline(h=cutoff, lty=2, col=dark$red, lwd=1)
 
   if (length(nonstat) > 0) {
