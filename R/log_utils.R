@@ -25,8 +25,12 @@ readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
 
   if (as.mcmc == TRUE) {
       if (is.null(logfile$Sample)) {
-          logfile$Sample <- logfile$state
-          logfile$state  <- NULL
+          if (is.null(logfile$state)) {
+              logfile$Sample <- as.numeric(rownames(logfile))
+          } else {
+              logfile$Sample <- logfile$state
+              logfile$state  <- NULL
+          }
       }
       start <- logfile$Sample[1]
       thin  <- logfile$Sample[2]-logfile$Sample[1]
