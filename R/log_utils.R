@@ -94,7 +94,7 @@ getLogFileSubset <- function(logfile, pattern, start=FALSE) {
   }
 
   if (coda::is.mcmc(logfile) || coda::is.mcmc.list(logfile)) {
-      return(logfile[, grepl(pattern, varnames(logfile)), drop=TRUE])
+      return(logfile[, grepl(pattern, coda::varnames(logfile)), drop=TRUE])
   } else {
 
       if (is.data.frame(logfile)) {
@@ -239,7 +239,7 @@ constantParsMCMC <- function(data) {
   if (coda::is.mcmc(data)) {
 
       result <- c()
-      for (par in varnames(data)) {
+      for (par in coda::varnames(data)) {
         if (all(data[ ,par, drop=FALSE] == data[1, par])) {
           result <- c(result, par)
         }
@@ -292,7 +292,7 @@ constantPars <- function(data) {
 #'
 #' @export
 sampledPars <- function(data) {
-    return(setdiff(varnames(data), constantPars(data)))
+    return(setdiff(coda::varnames(data), constantPars(data)))
 }
 
 
