@@ -1,6 +1,6 @@
 
 
-#' Read in BEAST trees file
+#' Read BEAST trees file
 #'
 #' The file can contain a single tree or a set of posterior trees. The
 #' file must be in NEXUS format and must be terminated by END;
@@ -15,10 +15,103 @@
 #' @export
 readTreeLog <- function(filename, burnin=0.1) {
   if (burnin > 1) {
-    stop("Error: Burnin must be a proportion of samples between 0 and 1.")
+      stop("Error: Burnin must be a proportion of samples between 0 and 1.")
   }
   treesfile <- ape::read.nexus(filename)
   n <- length(treesfile)
   return(treesfile[floor(burnin*n):n])
 }
 
+
+#' Private function for depth first traversal of a tree in order to get
+#' the node heights
+treeDFS <- function(i, t, treetable) {
+
+  t <- t + treetable$edgelen[i]
+  treetable$heights[i] <- t
+
+  children <- which(treetable$parents == i)
+  if (length(children) == 0) {
+    treetable$types[i] <- "sample"
+  } else {
+    treetable$types[i] <- "coalescent"
+    for (c in children) {
+      treetable <- treeDFS(c, t, treetable)
+    }
+  }
+
+  return(treetable)
+}
+
+
+#' Return a table of the heights and types of all nodes in a tree
+#'
+#' Internal nodes are labelled "coalescent" and leaves are lablled "sample"
+#'
+#' Use depth first search to get the tree intervals
+#'
+#' This can be used to get the vector of speciation/transmission and sampling times for a
+#' phylogenetic tree.
+#'
+#' The results of this function are equivalent to TreeSim::getx()
+#'
+#' When sampling and coalescent events are at the same times the sampling events are considered first
+#'
+#' The row names are the node numbers
+#'
+#' @param tree An object of class "phylo" from ape
+#'
+#' @export
+getTreeIntervals <- function(tree, ordered=TRUE, decreasing=FALSE) {
+
+  # Total number of nodes in the tree
+  n <- tree$Nnode + length(tree$tip.label)
+
+  # Initialise arrays
+  parents <- numeric(n)
+  edgelen <- numeric(n)
+  heights <- numeric(n)
+  types   <- factor(rep(0,n), levels = c("coalescent", "sample"))
+  treetable <- data.frame(parents, edgelen, heights, types)
+
+  # Get parents and edge lengths
+  for (i in 1:nrow(tree$edge)) {
+    p <- tree$edge[i,1]
+    c <- tree$edge[i,2]
+    treetable$parents[c] <- p
+    treetable$edgelen[c] <- tree$edge.length[i]
+  }
+
+  # Fill in heights and types
+  rootnode  <- which(treetable$parents == 0)
+  treetable <- treeDFS(rootnode, 0, treetable)
+
+  # Flip and order
+  tmrca <- max(treetable$heights)
+  treetable$heights <- tmrca - treetable$heights
+
+  if (ordered) {
+      ordering <- order(treetable$heights, decreasing = decreasing)
+      return (treetable[ordering, 3:4])
+  } else {
+      return (treetable[, 3:4])
+  }
+}
+
+#' Get sampling times of a tree
+#'
+#' @export
+getSamplingTimes <- function(tree, ordered=TRUE, decreasing=FALSE) {
+  intervals <- getTreeIntervals(tree, ordered=ordered, decreasing=decreasing)
+
+  return( intervals$heights[intervals$types == "sample"])
+}
+
+#' Get branching times of a tree
+#'
+#' @export
+getBranchingTimes <- function(tree, ordered=TRUE, decreasing=FALSE) {
+  intervals <- getTreeIntervals(tree, ordered=ordered, decreasing=decreasing)
+
+  return( intervals$heights[intervals$types == "coalescent"])
+}

@@ -1,7 +1,7 @@
 Package: beastio
 Type: Package
 Title: Functions for pre- and post-processing of BEAST and BEAST2 files.
-Version: 0.2.1
+Version: 0.2.2
 Author: Louis du Plessis
 Maintainer: Louis du Plessis <louis.duplessis@zoo.ox.ac.uk>
 Description: This package primarily provides a library of functions for reading
@@ -16,3 +16,5 @@ License: GPL-3.0
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
+Suggests: 
+    testthat
