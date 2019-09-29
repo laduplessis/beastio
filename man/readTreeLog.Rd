@@ -7,13 +7,23 @@
 readTreeLog(filename, burnin = 0.1)
 }
 \arguments{
-\item{filename}{The trees file.}
+\item{filename}{The input trees file.}
 
-\item{burnin}{Discard this proportion of samples at the start of the chain.}
+\item{burnin}{Discard this proportion of trees at the start of the file.}
+}
+\value{
+An object of class "phylo" or "multiphylo" containing one or many 
+trees.
 }
 \description{
-The file can contain a single tree or a set of posterior trees. The
-file must be in NEXUS format and must be terminated by END;
+This function reads in a \code{.trees} file written by BEAST,
+BEAST2 or one of the associated packages. The input file 
+can contain a single tree or a set of posterior trees. The input
+file must be in NEXUS format and must be terminated by "END;"
+}
+\details{
+In practice the function is a wrapper for \code{\link[ape]{read.nexus}},
+with the ability to easily discard some proportion of trees as burnin-in.
 }
 \section{Warning}{
 
@@ -21,3 +31,14 @@ file must be in NEXUS format and must be terminated by END;
   file is large this may take a long time or run out of memory.
 }
 
+\examples{
+# Read trees file with 10\% burnin
+readTreeLog(filename)
+
+# Read trees file without a burnin
+readTreeLog(filename, burnin=0)
+
+}
+\seealso{
+\code{\link[ape]{read.nexus}}, \code{\link[ape]{read.tree}}
+}

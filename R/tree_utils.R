@@ -2,15 +2,35 @@
 
 #' Read BEAST trees file
 #'
-#' The file can contain a single tree or a set of posterior trees. The
-#' file must be in NEXUS format and must be terminated by END;
+#' This function reads in a \code{.trees} file written by BEAST,
+#' BEAST2 or one of the associated packages. The input file 
+#' can contain a single tree or a set of posterior trees. The input
+#' file must be in NEXUS format and must be terminated by "END;"
+#'
+#' In practice the function is a wrapper for \code{\link[ape]{read.nexus}},
+#' with the ability to easily discard some proportion of trees as burnin-in.
 #'
 #' @section Warning:
 #'   The function will attempt to read the whole trees file. If the
 #'   file is large this may take a long time or run out of memory.
 #'
-#' @param filename The trees file.
-#' @param burnin Discard this proportion of samples at the start of the chain.
+#' @param filename The input trees file.
+#' @param burnin Discard this proportion of trees at the start of the file.
+#'
+#' @return An object of class "phylo" or "multiphylo" containing one or many 
+#' trees.
+#' 
+#' @seealso \code{\link[ape]{read.nexus}}, \code{\link[ape]{read.tree}}
+#' 
+#' @examples 
+#' # Read trees file with 10% burnin
+#' readTreeLog(filename)
+#' 
+#' # Read trees file without a burnin
+#' readTreeLog(filename, burnin=0)
+#' 
+#' @todo Make it possible to skip a number of trees upfront and to only 
+#' read in a fixed number of trees
 #'
 #' @export
 readTreeLog <- function(filename, burnin=0.1) {
