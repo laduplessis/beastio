@@ -2,7 +2,7 @@
 % Please edit documentation in R/tree_utils.R
 \name{readTreeLog}
 \alias{readTreeLog}
-\title{Read in BEAST trees file}
+\title{Read BEAST trees file}
 \usage{
 readTreeLog(filename, burnin = 0.1)
 }

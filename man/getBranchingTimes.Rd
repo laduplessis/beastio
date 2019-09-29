@@ -4,8 +4,8 @@
 \alias{getBranchingTimes}
 \title{Get branching times of a tree}
 \usage{
-getBranchingTimes(tree, ordered = TRUE, decreasing = FALSE)
+getBranchingTimes(tree, ...)
 }
 \description{
-Get branching times of a tree
+For an ultrametric tree this should be equivalent to the ape::coalescent.intervals
 }

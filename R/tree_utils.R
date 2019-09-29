@@ -23,7 +23,7 @@ readTreeLog <- function(filename, burnin=0.1) {
 }
 
 
-#' Private function for depth first traversal of a tree in order to get
+#' Internal function for depth first traversal of a tree in order to get
 #' the node heights
 treeDFS <- function(i, t, treetable) {
 
@@ -43,6 +43,14 @@ treeDFS <- function(i, t, treetable) {
   return(treetable)
 }
 
+#' Internal function to get the number of lineages during an interval
+getLineages <- function(types) {
+  n <- length(types)
+  increment <- rep(-1, n)
+  increment[types == "sample"] <- 1
+  
+  return( c(0, cumsum(increment[1:(n-1)])) )
+}
 
 #' Return a table of the heights and types of all nodes in a tree
 #'
@@ -62,8 +70,12 @@ treeDFS <- function(i, t, treetable) {
 #' @param tree An object of class "phylo" from ape
 #'
 #' @export
-getTreeIntervals <- function(tree, ordered=TRUE, decreasing=FALSE) {
+getTreeIntervals <- function(tree, decreasing=FALSE) {
 
+  if (class(tree) != "phylo") {
+      stop("Input tree is not of class \"phylo\".")
+  }
+  
   # Total number of nodes in the tree
   n <- tree$Nnode + length(tree$tip.label)
 
@@ -90,28 +102,37 @@ getTreeIntervals <- function(tree, ordered=TRUE, decreasing=FALSE) {
   tmrca <- max(treetable$heights)
   treetable$heights <- tmrca - treetable$heights
 
-  if (ordered) {
-      ordering <- order(treetable$heights, decreasing = decreasing)
-      return (treetable[ordering, 3:4])
-  } else {
-      return (treetable[, 3:4])
-  }
+  ordering  <- order(treetable$heights, decreasing = decreasing)
+  treetable <- treetable[ordering,]
+
+  result <- data.frame(node      = row.names(treetable), 
+                       nodetype  = treetable$types, 
+                       height    = treetable$heights,
+                       length    = c(0, diff(treetable$heights)),
+                       nlineages = getLineages(treetable$types))
+  return(result)
 }
 
 #' Get sampling times of a tree
 #'
 #' @export
-getSamplingTimes <- function(tree, ordered=TRUE, decreasing=FALSE) {
-  intervals <- getTreeIntervals(tree, ordered=ordered, decreasing=decreasing)
+getSamplingTimes <- function(tree, ...) {
+  intervals <- getTreeIntervals(tree, ...)
 
-  return( intervals$heights[intervals$types == "sample"])
+  return( intervals$height[intervals$nodetype == "sample"])
 }
 
 #' Get branching times of a tree
 #'
+#' For an ultrametric tree this should be equivalent to the ape::coalescent.intervals
+#'
 #' @export
-getBranchingTimes <- function(tree, ordered=TRUE, decreasing=FALSE) {
-  intervals <- getTreeIntervals(tree, ordered=ordered, decreasing=decreasing)
+getBranchingTimes <- function(tree, ...) {
+  intervals <- getTreeIntervals(tree, ...)
 
-  return( intervals$heights[intervals$types == "coalescent"])
+  return( intervals$height[intervals$nodetype == "coalescent"])
 }
+
+
+
+

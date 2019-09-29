@@ -2,17 +2,19 @@
 % Please edit documentation in R/tree_utils.R
 \name{getTreeIntervals}
 \alias{getTreeIntervals}
-\title{Return a table of heights and types (sampling/coalescent event) for all nodes in a tree}
+\title{Return a table of the heights and types of all nodes in a tree}
 \usage{
-getTreeIntervals(tree, ordered = TRUE, decreasing = FALSE)
+getTreeIntervals(tree, decreasing = FALSE)
 }
 \arguments{
 \item{tree}{An object of class "phylo" from ape}
 }
 \description{
-Use depth first search to get the tree intervals
+Internal nodes are labelled "coalescent" and leaves are lablled "sample"
 }
 \details{
+Use depth first search to get the tree intervals
+
 This can be used to get the vector of speciation/transmission and sampling times for a
 phylogenetic tree.
 

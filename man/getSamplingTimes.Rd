@@ -4,7 +4,7 @@
 \alias{getSamplingTimes}
 \title{Get sampling times of a tree}
 \usage{
-getSamplingTimes(tree, ordered = TRUE, decreasing = FALSE)
+getSamplingTimes(tree, ...)
 }
 \description{
 Get sampling times of a tree
