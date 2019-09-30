@@ -7,7 +7,8 @@
 applyMCMC(data, fun = median, ...)
 }
 \arguments{
-\item{data}{The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"}
+\item{data}{The object containing the MCMC sample - usually an object of class
+"mcmc" or "mcmc.list"}
 
 \item{fun}{The function to apply to the MCMC sample, by default median}
 

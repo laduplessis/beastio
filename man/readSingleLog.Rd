@@ -8,15 +8,27 @@ readSingleLog(filename, burnin = 0.1, maxsamples = -1,
   as.mcmc = TRUE)
 }
 \arguments{
-\item{filename}{The log file.}
+\item{filename}{The name of the log file to read.}
 
 \item{burnin}{Discard this proportion of samples at the start of the chain.}
 
 \item{maxsamples}{If > 0 stop after reading in this many lines
 (this option is only for testing and should generally not be used).}
 
-\item{as.mcmc}{If FALSE then return a data.frame, otherwise return an mcmc object}
+\item{as.mcmc}{If FALSE then return an object of class "data.frame", else
+return an "mcmc" object}
+}
+\value{
+An "mcmc" object (\code{\link[coda]{mcmc}}) or data frame
+        (\code{\link{data.frame}}) object containing all of the parameters
+        in the MCMC chain, with the burn-in discarded.
 }
 \description{
-Read in a single BEAST logfile and return as a coda mcmc object
+Read a single BEAST log file and return as a coda "mcmc" object.
+}
+\examples{
+
+}
+\seealso{
+\code{\link{readLog}}
 }

@@ -1,5 +1,5 @@
 ###############################################################################
-# Utilities for reading BEAST logfiles and getting HPDs
+# Utilities for reading BEAST log files and getting HPDs
 #
 # TODO: Port functions in the ESS class of BEAST2 to calculate convergence statistics
 #       -> No, use coda instead and ignore the BEAST/BEAST2 functions
@@ -7,14 +7,23 @@
 
 
 #' Read a single BEAST log file
-#' 
-#' Read in a single BEAST logfile and return as a coda mcmc object
 #'
-#' @param filename The log file.
+#' Read a single BEAST log file and return as a coda "mcmc" object.
+#'
+#' @param filename The name of the log file to read.
 #' @param burnin Discard this proportion of samples at the start of the chain.
 #' @param maxsamples If > 0 stop after reading in this many lines
 #'        (this option is only for testing and should generally not be used).
-#' @param as.mcmc If FALSE then return a data.frame, otherwise return an mcmc object
+#' @param as.mcmc If FALSE then return an object of class "data.frame", else
+#'        return an "mcmc" object
+#'
+#' @return An "mcmc" object (\code{\link[coda]{mcmc}}) or data frame
+#'         (\code{\link{data.frame}}) object containing all of the parameters
+#'         in the MCMC chain, with the burn-in discarded.
+#'
+#' @seealso \code{\link{readLog}}
+#'
+#' @examples
 #'
 readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
   if (burnin > 1) {
@@ -46,13 +55,26 @@ readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
 }
 
 #' Read BEAST log files
-#' 
-#' Read in a BEAST logfile and return as a coda mcmc object.
-#' If filenames contains more than one entry each log file is added as a separate chain and
-#' a coda mcmc.list object is returned
 #'
-#' @param filenames The input log file, or alternatively, a vector or list of input log files.
+#' Read a single BEAST log file and return as a coda "mcmc" object.
+#' If filenames contains more than one entry each log file is added as a separate chain and
+#' a coda "mcmc.list" object is returned.
+#'
+#' @param filenames The name of the log file to read, or aternatively a vector or list of
+#'        input log file names.
 #' @inheritParams readSingleLog
+#'
+#' @return An "mcmc" object (\code{\link[coda]{mcmc}}) or data frame
+#'         (\code{\link{data.frame}}) object containing all of the parameters
+#'         in the MCMC chain, with the burn-in discarded. If more than one log file was
+#'         given as input the output will be an "mcmc.list" object
+#'         (\code{\link[coda]{mcmc.list}}) or a list of data frames
+#'         (\code{\link{data.frame}}).
+#'
+#' @seealso \code{\link{readSingleLog}}
+#'
+#'
+#' @examples
 #'
 #' @export
 readLog <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
@@ -77,16 +99,29 @@ readLog <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
 
 
 
-#' Extract all matching parameters from the logfile
-#' The object returned is always in the same format as logfile
-#' (mcmc, mcmc.list, data.frame, or list<data.frame>)
+#' Extract a subset of parameters from a log file
 #'
-#' e.g if par="R0" extract (R0s.1 R0s.2 R0s.3 etc.)
+#' Extract all parameters from the log file that matches \code{pattern}.
+#' e.g if par="R0" extract (R0s.1 R0s.2 R0s.3 etc.).
+#' If the input log file contains more than one chain, the set of matching
+#' parameters will be extracted from each chain.
 #'
-#' @param logfile The logfile object to subset
-#' @param pattern The string to match with the start of the parameters to extract. Can be a regular expression
-#' @param start   If TRUE then only the start of parameters are matched against pattern (pattern becomes "^<pattern>")
-#' @return A logfile object with only those parameters that match pattern
+#'
+#' @param logfile The logfile object to extract the subset from. Can be an
+#'        "mcmc", "mcmc.list" or "data.frame" object, or a list of "data.frame"
+#'        objects.
+#' @param pattern The string to match with the names of the parameters to
+#'        extract. This is treated as a regular expression.
+#' @param start   If TRUE then only the start of parameter names are matched
+#'        against pattern (\code{pattern} becomes "^<pattern>")
+#'
+#' @return The object returned is always of the same class as the input
+#'         log file (\code{\link[coda]{mcmc}}, \code{\link[coda]{mcmc.list}},
+#'         \code{\link{data.frame}} or a list of \code{\link{data.frame}}),
+#'         but will only contain traces for the parameters matching
+#'         \code{pattern}.
+#'
+#' @seealso \link{readLog}, \link{grep}
 #'
 #' @export
 getLogFileSubset <- function(logfile, pattern, start=FALSE) {
@@ -118,7 +153,8 @@ getLogFileSubset <- function(logfile, pattern, start=FALSE) {
 
 #' Apply a function to an mcmc or mcmc.list object, e.g. median
 #'
-#' @param data The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
+#' @param data The object containing the MCMC sample - usually an object of class
+#'        "mcmc" or "mcmc.list"
 #' @param fun  The function to apply to the MCMC sample, by default median
 #' @param ...  Extra parameters to be passed to the function
 #'
@@ -145,6 +181,7 @@ applyMCMC <- function(data, fun=median, ...) {
 }
 
 #' Calculate the HPD interval and median and return in a single object
+#'
 #' Only works for mcmc and mcmc.list objects
 #'
 #' @param data The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"

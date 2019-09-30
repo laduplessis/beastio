@@ -7,17 +7,17 @@
 readTreeLog(filename, burnin = 0.1)
 }
 \arguments{
-\item{filename}{The input trees file.}
+\item{filename}{The name of the trees file to read.}
 
 \item{burnin}{Discard this proportion of trees at the start of the file.}
 }
 \value{
-An object of class "phylo" or "multiphylo" containing one or many 
+An object of class "phylo" or "multiphylo" containing one or many
 trees.
 }
 \description{
 This function reads in a \code{.trees} file written by BEAST,
-BEAST2 or one of the associated packages. The input file 
+BEAST2 or one of the associated packages. The input file
 can contain a single tree or a set of posterior trees. The input
 file must be in NEXUS format and must be terminated by "END;"
 }
@@ -37,6 +37,7 @@ readTreeLog(filename)
 
 # Read trees file without a burnin
 readTreeLog(filename, burnin=0)
+
 
 }
 \seealso{

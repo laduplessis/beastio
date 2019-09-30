@@ -2,8 +2,7 @@
 % Please edit documentation in R/log_utils.R
 \name{getHPDMedian}
 \alias{getHPDMedian}
-\title{Calculate the HPD interval and median and return in a single object
-Only works for mcmc and mcmc.list objects}
+\title{Calculate the HPD interval and median and return in a single object}
 \usage{
 getHPDMedian(data, prob = 0.95, ...)
 }
@@ -15,6 +14,5 @@ getHPDMedian(data, prob = 0.95, ...)
 \item{...}{Extra parameters to be passed to the median function}
 }
 \description{
-Calculate the HPD interval and median and return in a single object
 Only works for mcmc and mcmc.list objects
 }

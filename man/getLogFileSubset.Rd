@@ -2,22 +2,34 @@
 % Please edit documentation in R/log_utils.R
 \name{getLogFileSubset}
 \alias{getLogFileSubset}
-\title{Extract all matching parameters from the logfile
-The object returned is always in the same format as logfile
-(mcmc, mcmc.list, data.frame, or list<data.frame>)}
+\title{Extract a subset of parameters from a log file}
 \usage{
 getLogFileSubset(logfile, pattern, start = FALSE)
 }
 \arguments{
-\item{logfile}{The logfile object to subset}
+\item{logfile}{The logfile object to extract the subset from. Can be an
+"mcmc", "mcmc.list" or "data.frame" object, or a list of "data.frame"
+objects.}
 
-\item{pattern}{The string to match with the start of the parameters to extract. Can be a regular expression}
+\item{pattern}{The string to match with the names of the parameters to
+extract. This is treated as a regular expression.}
 
-\item{start}{If TRUE then only the start of parameters are matched against pattern (pattern becomes "^<pattern>")}
+\item{start}{If TRUE then only the start of parameter names are matched
+against pattern (\code{pattern} becomes "^<pattern>")}
 }
 \value{
-A logfile object with only those parameters that match pattern
+The object returned is always of the same class as the input
+        log file (\code{\link[coda]{mcmc}}, \code{\link[coda]{mcmc.list}},
+        \code{\link{data.frame}} or a list of \code{\link{data.frame}}),
+        but will only contain traces for the parameters matching
+        \code{pattern}.
 }
 \description{
-e.g if par="R0" extract (R0s.1 R0s.2 R0s.3 etc.)
+Extract all parameters from the log file that matches \code{pattern}.
+e.g if par="R0" extract (R0s.1 R0s.2 R0s.3 etc.).
+If the input log file contains more than one chain, the set of matching
+parameters will be extracted from each chain.
+}
+\seealso{
+\link{readLog}, \link{grep}
 }

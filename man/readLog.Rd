@@ -7,17 +7,33 @@
 readLog(filenames, burnin = 0.1, maxsamples = -1, as.mcmc = TRUE)
 }
 \arguments{
-\item{filenames}{The input log file, or alternatively, a vector or list of input log files.}
+\item{filenames}{The name of the log file to read, or aternatively a vector or list of
+input log file names.}
 
 \item{burnin}{Discard this proportion of samples at the start of the chain.}
 
 \item{maxsamples}{If > 0 stop after reading in this many lines
 (this option is only for testing and should generally not be used).}
 
-\item{as.mcmc}{If FALSE then return a data.frame, otherwise return an mcmc object}
+\item{as.mcmc}{If FALSE then return an object of class "data.frame", else
+return an "mcmc" object}
+}
+\value{
+An "mcmc" object (\code{\link[coda]{mcmc}}) or data frame
+        (\code{\link{data.frame}}) object containing all of the parameters
+        in the MCMC chain, with the burn-in discarded. If more than one log file was
+        given as input the output will be an "mcmc.list" object
+        (\code{\link[coda]{mcmc.list}}) or a list of data frames
+        (\code{\link{data.frame}}).
 }
 \description{
-Read in a BEAST logfile and return as a coda mcmc object.
+Read a single BEAST log file and return as a coda "mcmc" object.
 If filenames contains more than one entry each log file is added as a separate chain and
-a coda mcmc.list object is returned
+a coda "mcmc.list" object is returned.
+}
+\examples{
+
+}
+\seealso{
+\code{\link{readSingleLog}}
 }

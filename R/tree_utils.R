@@ -1,14 +1,14 @@
 ###############################################################################
 # Utilities for reading BEAST tree files and getting tree intervals
 #
-# TODO: Make it possible to only read in some number of trees or to buffer 
+# TODO: Make it possible to only read in some number of trees or to buffer
 # reading in big trees files
 #
 
 #' Read BEAST trees file
 #'
 #' This function reads in a \code{.trees} file written by BEAST,
-#' BEAST2 or one of the associated packages. The input file 
+#' BEAST2 or one of the associated packages. The input file
 #' can contain a single tree or a set of posterior trees. The input
 #' file must be in NEXUS format and must be terminated by "END;"
 #'
@@ -19,18 +19,18 @@
 #'   The function will attempt to read the whole trees file. If the
 #'   file is large this may take a long time or run out of memory.
 #'
-#' @param filename The input trees file.
+#' @param filename The name of the trees file to read.
 #' @param burnin Discard this proportion of trees at the start of the file.
 #'
-#' @return An object of class "phylo" or "multiphylo" containing one or many 
+#' @return An object of class "phylo" or "multiphylo" containing one or many
 #' trees.
-#' 
+#'
 #' @seealso \code{\link[ape]{read.nexus}}, \code{\link[ape]{read.tree}}
-#' 
-#' @examples 
+#'
+#' @examples
 #' # Read trees file with 10% burnin
 #' readTreeLog(filename)
-#' 
+#'
 #' # Read trees file without a burnin
 #' readTreeLog(filename, burnin=0)
 #'
@@ -71,7 +71,7 @@ getLineages <- function(types) {
   n <- length(types)
   increment <- rep(-1, n)
   increment[types == "sample"] <- 1
-  
+
   return( c(0, cumsum(increment[1:(n-1)])) )
 }
 
@@ -98,7 +98,7 @@ getTreeIntervals <- function(tree, decreasing=FALSE) {
   if (class(tree) != "phylo") {
       stop("Input tree is not of class \"phylo\".")
   }
-  
+
   # Total number of nodes in the tree
   n <- tree$Nnode + length(tree$tip.label)
 
@@ -128,8 +128,8 @@ getTreeIntervals <- function(tree, decreasing=FALSE) {
   ordering  <- order(treetable$heights, decreasing = decreasing)
   treetable <- treetable[ordering,]
 
-  result <- data.frame(node      = row.names(treetable), 
-                       nodetype  = treetable$types, 
+  result <- data.frame(node      = row.names(treetable),
+                       nodetype  = treetable$types,
                        height    = treetable$heights,
                        length    = c(0, diff(treetable$heights)),
                        nlineages = getLineages(treetable$types))
