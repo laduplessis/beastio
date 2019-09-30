@@ -13,8 +13,8 @@ test_that("getTreeIntervals works on a heterochronous trees", {
   tree   <- ape::read.tree("../testTree2.tree")
   result <- getTreeIntervals(tree)
   expect_equal(result$height,               c(0, 8,10,15,15,16,17,17,22))
-  expect_equal(as.numeric(result$nodetype), c(2, 2, 2, 2, 1, 1, 2, 1, 1))
-  expect_equal(result$nlineages,            c(0, 1, 2, 3, 4, 3, 2, 3, 2))
+  expect_equal(as.numeric(result$nodetype), c(2, 2, 2, 1, 2, 1, 1, 2, 1))
+  expect_equal(result$nlineages,            c(0, 1, 2, 3, 2, 3, 2, 1, 2))
   expect_equal(result$length,               c(0, 8, 2, 5, 0, 1, 1, 0, 5))
 
   tree   <- ape::read.tree("../testTree3.tree")

@@ -75,23 +75,50 @@ getLineages <- function(types) {
   return( c(0, cumsum(increment[1:(n-1)])) )
 }
 
-#' Return a table of the heights and types of all nodes in a tree
+#' Intervals of a phylogenetic tree
+#' 
+#' Function to get the coalescent and sampling intervals of a binary tree
+#' (the function also works for serially-sampled trees).
+#' The function returns a table with each row representing one of the 
+#' intervals in the tree. This can be used to get the vector of 
+#' speciation/transmission and sampling times for a phylogenetic tree.
+#' 
+#' Each row of the output table represents an interval of the tree. Intervals
+#' are between successive nodes in the tree, with time measured from the present
+#' (\eqn{t = 0}) into the past. For an interval between time \eqn{x} and \eqn{y}, 
+#' with \eqn{x < y}, the function returns
+#' 
+#' \itemize{
+#'     \item The node number of the node at time \eqn{y} in \code{tree}.
+#'     \item The node type of the node at time \eqn{y} ("coalescent" for 
+#'           internal nodes and "sample" for leaves).
+#'     \item The height of the node at the end of the interval (\eqn{y}).
+#'     \item The length of the interval (\eqn{y - x}).
+#'     \item The number of lineages in the tree during the interval.
+#' }
+#' 
+#' Rows are ordered based on the end time of the intervals. If two nodes have the 
+#' same height, nodes are ordered by type ("coalescent" < "sample") and then by 
+#' node number.
+#' 
+#' To get the tree interval the function performs a depth first traversal of 
+#' the tree.
 #'
-#' Internal nodes are labelled "coalescent" and leaves are lablled "sample"
-#' Ordere by height first, then type (coalescent < sample), then node number
+#' The results of this function are equivalent to \code{\link[TreeSim]{getx}} 
+#' in the \code{TreeSim} package, but more verbose. 
 #'
-#' Use depth first search to get the tree intervals
-#'
-#' This can be used to get the vector of speciation/transmission and sampling times for a
-#' phylogenetic tree.
-#'
-#' The results of this function are equivalent to TreeSim::getx()
-#'
-#' When sampling and coalescent events are at the same times the sampling events are considered first
-#'
-#' The row names are the node numbers
 #'
 #' @param tree An object of class "phylo" from ape
+#' @param decreasing If FALSE intervals are ordered from the present into 
+#'        the past. If TRUE intervals are ordered from the tMRCA to the 
+#'        present.
+#'        
+#' @return A table with each row representing one of the tree intervals.
+#'
+#' @seealso \code{\link[TreeSim]{getx}}, \code{\link[ape]{branching.times}},
+#'          \code{\link[ape]{coalescent.intervals}}
+#'          
+#' @examples
 #'
 #' @export
 getTreeIntervals <- function(tree, decreasing=FALSE) {
@@ -138,7 +165,18 @@ getTreeIntervals <- function(tree, decreasing=FALSE) {
   return(result)
 }
 
-#' Get sampling times of a tree
+#' Sampling times of a phylogenetic tree
+#' 
+#' Return an ordered list of sampling times in a phylogenetic tree.
+#' For ultrametric trees this function should return a list of 0's.
+#' 
+#' @inheritParams getTreeIntervals
+#' @param ... Extra parameters to pass to \code{\link{getTreeIntervals}}.
+#'
+#' @return A list of times representing the heights of the leaf nodes in 
+#'         the tree.
+#'         
+#' @seealso \code{\link{getTreeIntervals}}, \code{\link[TreeSim]{getx}}
 #'
 #' @export
 getSamplingTimes <- function(tree, ...) {
@@ -147,9 +185,23 @@ getSamplingTimes <- function(tree, ...) {
   return( intervals$height[intervals$nodetype == "sample"])
 }
 
-#' Get branching times of a tree
+
+
+#' Branching (coalescent) times of a phylogenetic tree
+#' 
+#' Return an ordered list of branching (coalescent) times in a phylogenetic tree.
+#' For an ultrametric tree this should be equivalent to 
+#' \code{\link[ape]{coalescent.intervals}}.
+#' 
+#' @inheritParams getTreeIntervals
+#' @param ... Extra parameters to pass to \code{\link{getTreeIntervals}}.
 #'
-#' For an ultrametric tree this should be equivalent to the ape::coalescent.intervals
+#' @return A list of times representing the heights of the leaf nodes in 
+#'         the tree.
+#'         
+#' @seealso \code{\link{getTreeIntervals}}, \code{\link[TreeSim]{getx}}, 
+#'          \code{\link[ape]{branching.times}}, \code{\link[ape]{coalescent.intervals}}
+#'
 #'
 #' @export
 getBranchingTimes <- function(tree, ...) {

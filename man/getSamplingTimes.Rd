@@ -2,10 +2,23 @@
 % Please edit documentation in R/tree_utils.R
 \name{getSamplingTimes}
 \alias{getSamplingTimes}
-\title{Get sampling times of a tree}
+\title{Sampling times of a phylogenetic tree}
 \usage{
 getSamplingTimes(tree, ...)
 }
+\arguments{
+\item{tree}{An object of class "phylo" from ape}
+
+\item{...}{Extra parameters to pass to \code{\link{getTreeIntervals}}.}
+}
+\value{
+A list of times representing the heights of the leaf nodes in 
+        the tree.
+}
 \description{
-Get sampling times of a tree
+Return an ordered list of sampling times in a phylogenetic tree.
+For ultrametric trees this function should return a list of 0's.
+}
+\seealso{
+\code{\link{getTreeIntervals}}, \code{\link[TreeSim]{getx}}
 }

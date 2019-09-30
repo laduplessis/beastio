@@ -2,10 +2,25 @@
 % Please edit documentation in R/tree_utils.R
 \name{getBranchingTimes}
 \alias{getBranchingTimes}
-\title{Get branching times of a tree}
+\title{Branching (coalescent) times of a phylogenetic tree}
 \usage{
 getBranchingTimes(tree, ...)
 }
+\arguments{
+\item{tree}{An object of class "phylo" from ape}
+
+\item{...}{Extra parameters to pass to \code{\link{getTreeIntervals}}.}
+}
+\value{
+A list of times representing the heights of the leaf nodes in 
+        the tree.
+}
 \description{
-For an ultrametric tree this should be equivalent to the ape::coalescent.intervals
+Return an ordered list of branching (coalescent) times in a phylogenetic tree.
+For an ultrametric tree this should be equivalent to 
+\code{\link[ape]{coalescent.intervals}}.
+}
+\seealso{
+\code{\link{getTreeIntervals}}, \code{\link[TreeSim]{getx}}, 
+         \code{\link[ape]{branching.times}}, \code{\link[ape]{coalescent.intervals}}
 }
