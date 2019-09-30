@@ -6,11 +6,13 @@
 #
 
 
+#' Read a single BEAST log file
+#' 
 #' Read in a single BEAST logfile and return as a coda mcmc object
 #'
-#' @param filename The logfile.
+#' @param filename The log file.
 #' @param burnin Discard this proportion of samples at the start of the chain.
-#' @param maxamples If > 0 stop after reading in this many lines
+#' @param maxsamples If > 0 stop after reading in this many lines
 #'        (this option is only for testing and should generally not be used).
 #' @param as.mcmc If FALSE then return a data.frame, otherwise return an mcmc object
 #'
@@ -43,15 +45,14 @@ readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
   }
 }
 
-#' Read in a single BEAST logfile and return as a coda mcmc object.
+#' Read BEAST log files
+#' 
+#' Read in a BEAST logfile and return as a coda mcmc object.
 #' If filenames contains more than one entry each log file is added as a separate chain and
 #' a coda mcmc.list object is returned
 #'
-#' @param filename The logfile.
-#' @param burnin Discard this proportion of samples at the start of the chain.
-#' @param maxamples If > 0 stop after reading in this many lines
-#'        (this option is only for testing and should generally not be used).
-#' @param as.mcmc If FALSE then return a data.frame, otherwise return an mcmc object
+#' @param filenames The input log file, or alternatively, a vector or list of input log files.
+#' @inheritParams readSingleLog
 #'
 #' @export
 readLog <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {

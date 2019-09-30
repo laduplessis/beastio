@@ -2,24 +2,22 @@
 % Please edit documentation in R/log_utils.R
 \name{readLog}
 \alias{readLog}
-\title{Read in a single BEAST logfile and return as a coda mcmc object.
-If filenames contains more than one entry each log file is added as a separate chain and
-a coda mcmc.list object is returned}
+\title{Read BEAST log files}
 \usage{
 readLog(filenames, burnin = 0.1, maxsamples = -1, as.mcmc = TRUE)
 }
 \arguments{
+\item{filenames}{The input log file, or alternatively, a vector or list of input log files.}
+
 \item{burnin}{Discard this proportion of samples at the start of the chain.}
 
-\item{as.mcmc}{If FALSE then return a data.frame, otherwise return an mcmc object}
-
-\item{filename}{The logfile.}
-
-\item{maxamples}{If > 0 stop after reading in this many lines
+\item{maxsamples}{If > 0 stop after reading in this many lines
 (this option is only for testing and should generally not be used).}
+
+\item{as.mcmc}{If FALSE then return a data.frame, otherwise return an mcmc object}
 }
 \description{
-Read in a single BEAST logfile and return as a coda mcmc object.
+Read in a BEAST logfile and return as a coda mcmc object.
 If filenames contains more than one entry each log file is added as a separate chain and
 a coda mcmc.list object is returned
 }

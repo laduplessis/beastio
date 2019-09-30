@@ -1,4 +1,9 @@
-
+###############################################################################
+# Utilities for reading BEAST tree files and getting tree intervals
+#
+# TODO: Make it possible to only read in some number of trees or to buffer 
+# reading in big trees files
+#
 
 #' Read BEAST trees file
 #'
@@ -28,9 +33,7 @@
 #' 
 #' # Read trees file without a burnin
 #' readTreeLog(filename, burnin=0)
-#' 
-#' @todo Make it possible to skip a number of trees upfront and to only 
-#' read in a fixed number of trees
+#'
 #'
 #' @export
 readTreeLog <- function(filename, burnin=0.1) {

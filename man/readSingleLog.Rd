@@ -2,20 +2,20 @@
 % Please edit documentation in R/log_utils.R
 \name{readSingleLog}
 \alias{readSingleLog}
-\title{Read in a single BEAST logfile and return as a coda mcmc object}
+\title{Read a single BEAST log file}
 \usage{
 readSingleLog(filename, burnin = 0.1, maxsamples = -1,
   as.mcmc = TRUE)
 }
 \arguments{
-\item{filename}{The logfile.}
+\item{filename}{The log file.}
 
 \item{burnin}{Discard this proportion of samples at the start of the chain.}
 
-\item{as.mcmc}{If FALSE then return a data.frame, otherwise return an mcmc object}
-
-\item{maxamples}{If > 0 stop after reading in this many lines
+\item{maxsamples}{If > 0 stop after reading in this many lines
 (this option is only for testing and should generally not be used).}
+
+\item{as.mcmc}{If FALSE then return a data.frame, otherwise return an mcmc object}
 }
 \description{
 Read in a single BEAST logfile and return as a coda mcmc object
