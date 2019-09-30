@@ -78,6 +78,7 @@ getLineages <- function(types) {
 #' Return a table of the heights and types of all nodes in a tree
 #'
 #' Internal nodes are labelled "coalescent" and leaves are lablled "sample"
+#' Ordere by height first, then type (coalescent < sample), then node number
 #'
 #' Use depth first search to get the tree intervals
 #'
@@ -106,7 +107,8 @@ getTreeIntervals <- function(tree, decreasing=FALSE) {
   parents <- numeric(n)
   edgelen <- numeric(n)
   heights <- numeric(n)
-  types   <- factor(rep(0,n), levels = c("coalescent", "sample"))
+  #types   <- factor(rep(0,n), levels = c("sample", "coalescent"))
+  types   <- ordered(rep(0,n), levels = c("coalescent", "sample"))
   treetable <- data.frame(parents, edgelen, heights, types)
 
   # Get parents and edge lengths
@@ -125,7 +127,7 @@ getTreeIntervals <- function(tree, decreasing=FALSE) {
   tmrca <- max(treetable$heights)
   treetable$heights <- tmrca - treetable$heights
 
-  ordering  <- order(treetable$heights, decreasing = decreasing)
+  ordering  <- order(treetable$heights, treetable$types, row.names(treetable), decreasing = decreasing)
   treetable <- treetable[ordering,]
 
   result <- data.frame(node      = row.names(treetable),
