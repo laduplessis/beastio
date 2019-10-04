@@ -115,7 +115,8 @@ getLineages <- function(types) {
 #'        
 #' @return A table with each row representing one of the tree intervals.
 #'
-#' @seealso \code{\link[TreeSim]{getx}}, \code{\link[ape]{branching.times}},
+#' @seealso \code{\link{getBranchingTimes}}, \code{\link{getSamplingTimes}},
+#'          \code{\link[TreeSim]{getx}}, \code{\link[ape]{branching.times}},
 #'          \code{\link[ape]{coalescent.intervals}}
 #'          
 #' @examples
