@@ -97,6 +97,43 @@ readLog <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
 
 }
 
+#' Save BEAST/Tracer log file
+#'
+#' What happens if it's a mcmc.list or a list of data frames?
+#' What if input is just a data frame?
+#'
+#' @param logfile
+#' @param filename
+#' @param renumber Renumber states from 1 to nrow(logfile)
+#' @param header Add a header with summary statistics to the file
+#' @param model Add the model description from a logfile written in BEAST (not implemented)
+#'
+#' @export
+writeLog <- function(logfile, filename, renumber=FALSE, header=TRUE, model="") {
+
+    # Write header
+    if (header) {
+        header <- c(paste0("Log file saved by beastio v", packageVersion("beastio"), format(Sys.time(), " on %d %b %Y, %H:%M:%S")),
+                    "(see https://github.com/laduplessis/beastio for more information)","","","summary:","")
+        header <- c(header, capture.output( summary(logfile)))
+        header <- paste("#",header)
+    }
+
+    outfile <- file(filename, "wt")
+    writeLines(header, outfile)
+    close(outfile)
+
+    # Write log file
+    if (renumber) {
+        samples <- 0:(nrow(logfile)-1)
+    } else {
+        samples <- 1+thin(logfile)*(0:(nrow(logfile)-1))
+    }
+    logtable <- cbind(samples, data.frame(logfile))
+    colnames(logtable)[1] <- "SAMPLE"
+    write.table(logtable, filename, sep="\t", quote = FALSE, row.names = FALSE, col.names=TRUE, append = TRUE)
+
+}
 
 
 #' Extract a subset of parameters from a log file

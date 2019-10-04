@@ -52,6 +52,7 @@ in the \code{TreeSim} package, but more verbose.
 
 }
 \seealso{
-\code{\link[TreeSim]{getx}}, \code{\link[ape]{branching.times}},
+\code{\link{getBranchingTimes}}, \code{\link{getSamplingTimes}},
+         \code{\link[TreeSim]{getx}}, \code{\link[ape]{branching.times}},
          \code{\link[ape]{coalescent.intervals}}
 }

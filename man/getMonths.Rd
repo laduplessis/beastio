@@ -7,8 +7,8 @@
 getMonths(from, to, floorFrom = TRUE, ceilTo = TRUE)
 }
 \arguments{
-\item{from, to}{Start and end of the date sequence (these should be date
-objects).}
+\item{from, to}{Start and end of the date sequence (these should be of
+class \code{\link{Date}}.}
 
 \item{floorFrom}{If TRUE the first element in the sequence is the start of
 the first month before \code{from}, otherwise \code{from}.}
@@ -16,7 +16,15 @@ the first month before \code{from}, otherwise \code{from}.}
 \item{ceilTo}{If TRUE the last element in the sequence is the start of
 the first month after \code{to}, otherwise \code{to}.}
 }
+\value{
+
+}
 \description{
-This function will return all the months between \code{from} and \code{to}.
-The dates in the sequence are the first day of each month.
+This function will return a sequence of the months between
+the dates \code{from} and \code{to}.
+The dates in the sequence that is returned are on the first day of
+each month.
+}
+\seealso{
+
 }
