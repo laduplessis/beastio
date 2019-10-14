@@ -113,15 +113,15 @@ writeLog <- function(logfile, filename, renumber=FALSE, header=TRUE, model="") {
 
     # Write header
     if (header) {
-        header <- c(paste0("Log file saved by beastio v", packageVersion("beastio"), format(Sys.time(), " on %d %b %Y, %H:%M:%S")),
+        headstr <- c(paste0("Log file saved by beastio v", packageVersion("beastio"), format(Sys.time(), " on %d %b %Y, %H:%M:%S")),
                     "(see https://github.com/laduplessis/beastio for more information)","","","summary:","")
-        header <- c(header, capture.output( summary(logfile)))
-        header <- paste("#",header)
-    }
+        headstr <- c(headstr, capture.output( summary(logfile)))
+        headstr <- paste("#",headstr)
 
-    outfile <- file(filename, "wt")
-    writeLines(header, outfile)
-    close(outfile)
+        outfile <- file(filename, "wt")
+        writeLines(headstr, outfile)
+        close(outfile)
+    }
 
     # Write log file
     if (renumber) {
