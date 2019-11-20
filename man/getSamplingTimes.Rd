@@ -12,7 +12,7 @@ getSamplingTimes(tree, ...)
 \item{...}{Extra parameters to pass to \code{\link{getTreeIntervals}}.}
 }
 \value{
-A list of times representing the heights of the leaf nodes in 
+A list of times representing the heights of the leaf nodes in
         the tree.
 }
 \description{

@@ -12,15 +12,15 @@ getBranchingTimes(tree, ...)
 \item{...}{Extra parameters to pass to \code{\link{getTreeIntervals}}.}
 }
 \value{
-A list of times representing the heights of the leaf nodes in 
+A list of times representing the heights of the leaf nodes in
         the tree.
 }
 \description{
 Return an ordered list of branching (coalescent) times in a phylogenetic tree.
-For an ultrametric tree this should be equivalent to 
+For an ultrametric tree this should be equivalent to
 \code{\link[ape]{coalescent.intervals}}.
 }
 \seealso{
-\code{\link{getTreeIntervals}}, \code{\link[TreeSim]{getx}}, 
+\code{\link{getTreeIntervals}}, \code{\link[TreeSim]{getx}},
          \code{\link[ape]{branching.times}}, \code{\link[ape]{coalescent.intervals}}
 }
