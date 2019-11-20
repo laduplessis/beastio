@@ -158,7 +158,7 @@ getTreeIntervals <- function(tree, decreasing=FALSE) {
   ordering  <- order(treetable$heights, treetable$types, row.names(treetable), decreasing = decreasing)
   treetable <- treetable[ordering,]
 
-  result <- data.frame(node      = row.names(treetable),
+  result <- data.frame(node      = as.numeric(row.names(treetable)),
                        nodetype  = treetable$types,
                        height    = treetable$heights,
                        length    = c(0, diff(treetable$heights)),
