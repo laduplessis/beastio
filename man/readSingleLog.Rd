@@ -4,8 +4,7 @@
 \alias{readSingleLog}
 \title{Read a single BEAST log file}
 \usage{
-readSingleLog(filename, burnin = 0.1, maxsamples = -1,
-  as.mcmc = TRUE)
+readSingleLog(filename, burnin = 0.1, maxsamples = -1, as.mcmc = TRUE)
 }
 \arguments{
 \item{filename}{The name of the log file to read.}

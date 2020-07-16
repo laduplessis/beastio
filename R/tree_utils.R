@@ -213,4 +213,81 @@ getBranchingTimes <- function(tree, ...) {
 
 
 
+#' Height of a clade in a phylogenetic tree
+#'
+#' Function that returns the height of the clade defined by the tips in \code{tips}.
+#' If the input tree is a single phylogenetic tree of class "phylo" the height of
+#' the clade is returned as a single number. If the input is a "multiPhylo" object
+#' then the distribution of heights across all trees is returned. If \code{as.mcmc} is
+#' true the distribution is returned as an "mcmc" object (\code{\link[coda]{mcmc}}).
+#'
+#' @section Warning:
+#'    If any of the tips are not present in any of the trees the function will crash.
+#'
+#' @param trees A single tree of class "phylo" or a set of trees of class "multiPhylo"
+#' @param tips  A vector of tips in the tree(s). Could either be numeric (tip numbers) or
+#'              a character vector (taxon names).
+#' @param as.mcmc Return the distribution as an object of class "mcmc" (\code{\link[coda]{mcmc}}).
+#'                (only has an effect if \code{trees} is of class "multiPhylo").
+#'
+#' @return A numeric vector of heights or an "mcmc" object containing the heights.
+#'
+#' @examples
+#'
+#' @export
+getCladeHeight <- function(trees, tips, as.mcmc=TRUE) {
 
+  # Internal function to get the height of a clade in a single tree
+  getCladeHeightSingleTree <- function(tree, tips) {
+    treeIntervals <- getTreeIntervals(tree)
+    mrca <- ape::getMRCA(tree, tips)
+    return( treeIntervals$height[treeIntervals$node == mrca] )
+  }
+
+
+  if (class(trees) == "phylo") {
+    return (getCladeHeightSingleTree(trees, tips))
+  } else {
+    dist <- sapply(trees, getCladeHeightSingleTree, nodes)
+    if (as.mcmc) {
+      return(coda::mcmc(dist))
+    } else {
+      return(dist)
+    }
+  }
+}
+
+
+
+#' Monophyly statistics of a clade in a list of trees
+#'
+#' Function that returns the probsbility of the clade defined by the tips in \code{tips}
+#' to be monophyletic in a list of trees. If the input tree is a single phylogenetic tree
+#' of class "phylo" the function returns 0 or 1. If the input is a "multiPhylo" object
+#' then the proportion of trees in which the clade is monophyletic is returned. This
+#' function uses the \code{\link[ape]{is.monophyletic}} function.
+#'
+#' @section Warning:
+#'    If any of the tips are not present in any of the trees the function will crash.
+#'
+#' @param trees A single tree of class "phylo" or a set of trees of class "multiPhylo"
+#' @param tips  A vector of tips in the tree(s). Could either be numeric (tip numbers) or
+#'              a character vector (taxon names).
+#'
+#' @return A floating point number between 0 and 1 giving the probability that the clade is
+#'         monophyletic.
+#'
+#' @seealso \code{\link[ape]{is.monophyletic}}
+#'
+#' @examples
+#'
+#' @export
+getCladeMonophyly <- function(trees, tips, ...) {
+
+  if (class(trees) == "phylo") {
+    return (as.numeric(ape::is.monophyletic(trees, tips, ...)))
+  } else {
+    monophyly <- sapply(trees, ape::is.monophyletic, tips)
+    return (sum(monophyly)/length(monophyly))
+  }
+}

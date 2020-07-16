@@ -4,8 +4,13 @@
 \alias{getWeeks}
 \title{Generate a sequence of weeks}
 \usage{
-getWeeks(from, to, week_start = getOption("lubridate.week.start", 7),
-  floorFrom = FALSE, ceilTo = FALSE)
+getWeeks(
+  from,
+  to,
+  week_start = getOption("lubridate.week.start", 7),
+  floorFrom = FALSE,
+  ceilTo = FALSE
+)
 }
 \arguments{
 \item{from, to}{Start and end of the date sequence (these should be date

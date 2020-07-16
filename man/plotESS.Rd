@@ -4,8 +4,14 @@
 \alias{plotESS}
 \title{Plot barplot of ESS values}
 \usage{
-plotESS(data, ess = NULL, cutoff = 200, title = "",
-  col = mPal(dark$blue, 0.5), ...)
+plotESS(
+  data,
+  ess = NULL,
+  cutoff = 200,
+  title = "",
+  col = mPal(dark$blue, 0.5),
+  ...
+)
 }
 \arguments{
 \item{data}{The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"}

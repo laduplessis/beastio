@@ -5,8 +5,7 @@
 \title{Check if any parameters in an mcmc chain have an ESS value < cutoff
 Constant (unsampled) parameters are ignored.}
 \usage{
-checkESS(data, cutoff = 200, value = TRUE, ignored = c(),
-  plot = FALSE, ...)
+checkESS(data, cutoff = 200, value = TRUE, ignored = c(), plot = FALSE, ...)
 }
 \arguments{
 \item{data}{The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"}
