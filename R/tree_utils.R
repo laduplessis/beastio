@@ -112,6 +112,9 @@ getLineages <- function(types) {
 #' @param decreasing If FALSE intervals are ordered from the present into
 #'        the past. If TRUE intervals are ordered from the tMRCA to the
 #'        present.
+#' @param raw If TRUE return the raw table before reordering and calculating
+#'        interval lengths or numbers of lineages. Mostly for debugging
+#'        purposes.
 #'
 #' @return A table with each row representing one of the tree intervals.
 #'
@@ -122,7 +125,7 @@ getLineages <- function(types) {
 #' @examples
 #'
 #' @export
-getTreeIntervals <- function(tree, decreasing=FALSE) {
+getTreeIntervals <- function(tree, decreasing=FALSE, raw=FALSE) {
 
   if (!("phylo" %in% class(tree))) {
       stop("Input tree is not of class \"phylo\".")
@@ -154,6 +157,10 @@ getTreeIntervals <- function(tree, decreasing=FALSE) {
   # Flip and order
   tmrca <- max(treetable$heights)
   treetable$heights <- tmrca - treetable$heights
+
+  if (raw) {
+    return(treetable)
+  }
 
   ordering  <- order(treetable$heights, treetable$types, row.names(treetable), decreasing = decreasing)
   treetable <- treetable[ordering,]
@@ -248,7 +255,7 @@ getCladeHeight <- function(trees, tips, as.mcmc=TRUE) {
   if (class(trees) == "phylo") {
     return (getCladeHeightSingleTree(trees, tips))
   } else {
-    dist <- sapply(trees, getCladeHeightSingleTree, nodes)
+    dist <- sapply(trees, getCladeHeightSingleTree, tips)
     if (as.mcmc) {
       return(coda::mcmc(dist))
     } else {

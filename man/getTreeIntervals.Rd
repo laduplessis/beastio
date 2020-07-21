@@ -4,7 +4,7 @@
 \alias{getTreeIntervals}
 \title{Intervals of a phylogenetic tree}
 \usage{
-getTreeIntervals(tree, decreasing = FALSE)
+getTreeIntervals(tree, decreasing = FALSE, raw = FALSE)
 }
 \arguments{
 \item{tree}{An object of class "phylo" from ape}
@@ -12,6 +12,10 @@ getTreeIntervals(tree, decreasing = FALSE)
 \item{decreasing}{If FALSE intervals are ordered from the present into
 the past. If TRUE intervals are ordered from the tMRCA to the
 present.}
+
+\item{raw}{If TRUE return the raw table before reordering and calculating
+interval lengths or numbers of lineages. Mostly for debugging
+purposes.}
 }
 \value{
 A table with each row representing one of the tree intervals.
