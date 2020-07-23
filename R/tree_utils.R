@@ -46,25 +46,27 @@ readTreeLog <- function(filename, burnin=0.1) {
 }
 
 
+
 #' Internal function for depth first traversal of a tree in order to get
 #' the node heights
-treeDFS <- function(i, t, treetable) {
+treeDFS <- function(i, t, treetable, children) {
 
   t <- t + treetable$edgelen[i]
   treetable$heights[i] <- t
 
-  children <- which(treetable$parents == i)
-  if (length(children) == 0) {
+  #children <- which(treetable$parents == i)
+  if (length(children[[i]]) == 0) {
     treetable$types[i] <- "sample"
   } else {
     treetable$types[i] <- "coalescent"
-    for (c in children) {
-      treetable <- treeDFS(c, t, treetable)
+    for (c in children[[i]]) {
+      treetable <- treeDFS(c, t, treetable, children)
     }
   }
 
   return(treetable)
 }
+
 
 #' Internal function to get the number of lineages during an interval
 getLineages <- function(types) {
@@ -74,6 +76,9 @@ getLineages <- function(types) {
 
   return( c(0, cumsum(increment[1:(n-1)])) )
 }
+
+
+
 
 #' Intervals of a phylogenetic tree
 #'
@@ -123,12 +128,107 @@ getLineages <- function(types) {
 #'          \code{\link[ape]{coalescent.intervals}}
 #'
 #' @examples
-#'
 #' @export
 getTreeIntervals <- function(tree, decreasing=FALSE, raw=FALSE) {
 
   if (!("phylo" %in% class(tree))) {
-      stop("Input tree is not of class \"phylo\".")
+    stop("Input tree is not of class \"phylo\".")
+  }
+
+  # Total number of nodes in the tree
+  n <- tree$Nnode + length(tree$tip.label)
+
+  #tic("Setup1")
+  rootnode     <- length(tree$tip.label)+1
+
+  parenttuples <- rbind(tree$edge, c(0, rootnode))
+  parents      <- parenttuples[order(parenttuples[, 2]), 1]
+
+  edgetuples   <- c(unlist(lapply(seq_along(tree$edge.length), function(i) { c(tree$edge[i, 2], tree$edge.length[i]) } )), rootnode, 0)
+  edgetuples   <- matrix(edgetuples, ncol=2, byrow = TRUE)
+  edgelen      <- edgetuples[order(edgetuples[, 1]), 2]
+
+  heights   <- numeric(n)
+  types     <- ordered(rep(0,n), levels = c("coalescent", "sample"))
+  treetable <- data.frame(parents, edgelen, heights, types)
+  #toc()
+
+  #tic("Setup2")
+  children <- vector(mode="list", length=n)
+  for (i in 1:nrow(tree$edge)) {
+    p <- tree$edge[i,1]
+    c <- tree$edge[i,2]
+
+    children[[p]] <- c(children[[p]], c)
+  }
+
+  #toc()
+
+  #tic("Recursion")
+  treetable <- treeDFS(rootnode, 0, treetable, children)
+  #toc()
+
+  # Flip and order
+  tmrca <- max(treetable$heights)
+  treetable$heights <- tmrca - treetable$heights
+
+  if (raw) {
+    return(treetable)
+  }
+
+  ordering  <- order(treetable$heights, treetable$types, row.names(treetable), decreasing = decreasing)
+  treetable <- treetable[ordering,]
+
+  result <- data.frame(node      = as.numeric(row.names(treetable)),
+                       nodetype  = treetable$types,
+                       height    = treetable$heights,
+                       length    = c(0, diff(treetable$heights)),
+                       nlineages = getLineages(treetable$types))
+  return(result)
+}
+
+
+#' Internal function for depth first traversal of a tree in order to get
+#' the node heights (for treeIntervalsSlow)
+treeDFSSlow <- function(i, t, treetable) {
+
+  t <- t + treetable$edgelen[i]
+  treetable$heights[i] <- t
+
+  children <- which(treetable$parents == i)
+  if (length(children) == 0) {
+    treetable$types[i] <- "sample"
+  } else {
+    treetable$types[i] <- "coalescent"
+    for (c in children) {
+      treetable <- treeDFSSlow(c, t, treetable)
+    }
+  }
+
+  return(treetable)
+}
+
+
+#' Intervals of a phylogenetic tree
+#'
+#' Function to get the coalescent and sampling intervals of a binary tree
+#' (the function also works for serially-sampled trees).
+#' The function returns a table with each row representing one of the
+#' intervals in the tree. This can be used to get the vector of
+#' speciation/transmission and sampling times for a phylogenetic tree.
+#'
+#' This is a deprecated version that is very slow on big trees (>10K nodes).
+#' This version is kept because it is easier to read and debug.
+#' Not using random access to arrays speeds up the initial setup.
+#'
+#' @inheritParams getTreeIntervals
+#'
+#' @seealso \code{\link{getTreeIntervals}}
+#'
+getTreeIntervalsSlow <- function(tree, decreasing=FALSE, raw=FALSE) {
+
+  if (!("phylo" %in% class(tree))) {
+    stop("Input tree is not of class \"phylo\".")
   }
 
   # Total number of nodes in the tree
@@ -172,6 +272,7 @@ getTreeIntervals <- function(tree, decreasing=FALSE, raw=FALSE) {
                        nlineages = getLineages(treetable$types))
   return(result)
 }
+
 
 #' Sampling times of a phylogenetic tree
 #'

@@ -5,7 +5,7 @@
 \title{Internal function for depth first traversal of a tree in order to get
 the node heights}
 \usage{
-treeDFS(i, t, treetable)
+treeDFS(i, t, treetable, children)
 }
 \description{
 Internal function for depth first traversal of a tree in order to get
