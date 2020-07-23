@@ -47,26 +47,6 @@ readTreeLog <- function(filename, burnin=0.1) {
 
 
 
-#' Internal function for depth first traversal of a tree in order to get
-#' the node heights
-treeDFS <- function(i, t, treetable, children) {
-
-  t <- t + treetable$edgelen[i]
-  treetable$heights[i] <- t
-
-  #children <- which(treetable$parents == i)
-  if (length(children[[i]]) == 0) {
-    treetable$types[i] <- "sample"
-  } else {
-    treetable$types[i] <- "coalescent"
-    for (c in children[[i]]) {
-      treetable <- treeDFS(c, t, treetable, children)
-    }
-  }
-
-  return(treetable)
-}
-
 
 #' Internal function to get the number of lineages during an interval
 getLineages <- function(types) {
@@ -138,7 +118,6 @@ getTreeIntervals <- function(tree, decreasing=FALSE, raw=FALSE) {
   # Total number of nodes in the tree
   n <- tree$Nnode + length(tree$tip.label)
 
-  #tic("Setup1")
   rootnode     <- length(tree$tip.label)+1
 
   parenttuples <- rbind(tree$edge, c(0, rootnode))
@@ -151,9 +130,7 @@ getTreeIntervals <- function(tree, decreasing=FALSE, raw=FALSE) {
   heights   <- numeric(n)
   types     <- ordered(rep(0,n), levels = c("coalescent", "sample"))
   treetable <- data.frame(parents, edgelen, heights, types)
-  #toc()
 
-  #tic("Setup2")
   children <- vector(mode="list", length=n)
   for (i in 1:nrow(tree$edge)) {
     p <- tree$edge[i,1]
@@ -162,18 +139,35 @@ getTreeIntervals <- function(tree, decreasing=FALSE, raw=FALSE) {
     children[[p]] <- c(children[[p]], c)
   }
 
-  #toc()
 
-  #tic("Recursion")
-  treetable <- treeDFS(rootnode, 0, treetable, children)
-  #toc()
+  #' Internal function for depth first traversal of a tree in order to get
+  #' the node heights
+  #'
+  treeDFS <- function(i, t, children) {
+
+    t <- t + treetable$edgelen[i]
+    treetable$heights[i] <<- t
+
+    if (length(children[[i]]) == 0) {
+        treetable$types[i] <<- "sample"
+    } else {
+        treetable$types[i] <<- "coalescent"
+        #lapply(seq_along(children[[i]]), function(j) treeDFS(children[[i]][j], t, children))
+        for (c in children[[i]]) {
+            treeDFS(c, t, children)
+        }
+    }
+
+  }
+
+  treeDFS(rootnode, 0, children)
 
   # Flip and order
   tmrca <- max(treetable$heights)
   treetable$heights <- tmrca - treetable$heights
 
   if (raw) {
-    return(treetable)
+      return(treetable)
   }
 
   ordering  <- order(treetable$heights, treetable$types, row.names(treetable), decreasing = decreasing)
@@ -252,7 +246,7 @@ getTreeIntervalsSlow <- function(tree, decreasing=FALSE, raw=FALSE) {
 
   # Fill in heights and types
   rootnode  <- which(treetable$parents == 0)
-  treetable <- treeDFS(rootnode, 0, treetable)
+  treetable <- treeDFSSlow(rootnode, 0, treetable)
 
   # Flip and order
   tmrca <- max(treetable$heights)
