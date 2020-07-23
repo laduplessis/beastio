@@ -52,6 +52,9 @@ the tree.
 The results of this function are equivalent to \code{\link[TreeSim]{getx}}
 in the \code{TreeSim} package, but more verbose.
 }
+\examples{
+
+}
 \seealso{
 \code{\link{getBranchingTimes}}, \code{\link{getSamplingTimes}},
          \code{\link[TreeSim]{getx}}, \code{\link[ape]{branching.times}},

@@ -108,6 +108,7 @@ getLineages <- function(types) {
 #'          \code{\link[ape]{coalescent.intervals}}
 #'
 #' @examples
+#'
 #' @export
 getTreeIntervals <- function(tree, decreasing=FALSE, raw=FALSE) {
 
@@ -140,9 +141,9 @@ getTreeIntervals <- function(tree, decreasing=FALSE, raw=FALSE) {
   }
 
 
-  #' Internal function for depth first traversal of a tree in order to get
-  #' the node heights
-  #'
+  # Internal function for depth first traversal of a tree in order to get
+  # the node heights
+  #
   treeDFS <- function(i, t, children) {
 
     t <- t + treetable$edgelen[i]
