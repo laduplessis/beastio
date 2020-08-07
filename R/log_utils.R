@@ -299,7 +299,7 @@ getHPD.boa <- function(data, alpha=0.05, includeMedian=TRUE) {
 #'
 #' @export
 getMatrixHPD.boa <- function(data, margin=2, dataframe=TRUE, ...) {
-  out <- apply(data, margin, getHPD, ...)
+  out <- apply(data, margin, getHPD.boa, ...)
   if (dataframe) {
     return(data.frame(out))
   } else {
