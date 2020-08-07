@@ -11,11 +11,16 @@
 #' Read a single BEAST log file and return as a coda "mcmc" object.
 #'
 #' @param filename The name of the log file to read.
-#' @param burnin Discard this proportion of samples at the start of the chain.
+#' @param burnin Discard this proportion of samples at the start of the chain
+#'        (if `burninAsSamples` == FALSE). Otherwise discard this many samples
+#'        at the start of the chain.
 #' @param maxsamples If > 0 stop after reading in this many lines
 #'        (this option is only for testing and should generally not be used).
 #' @param as.mcmc If FALSE then return an object of class "data.frame", else
 #'        return an "mcmc" object
+#' @param burninAsSamples if TRUE burnin is given as the number of samples,
+#'        if FALSE burnin is a proportion (0 <= burnin < 1) of samples.
+#'        (default = FALSE).
 #'
 #' @return An "mcmc" object (\code{\link[coda]{mcmc}}) or data frame
 #'         (\code{\link{data.frame}}) object containing all of the parameters
@@ -25,14 +30,29 @@
 #'
 #' @examples
 #'
-readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
-  if (burnin > 1) {
+readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE, burninAsSamples=FALSE) {
+  if (!burninAsSamples && burnin > 1) {
       stop("Error: Burnin must be a proportion of samples between 0 and 1.")
+  }
+
+  if (burninAsSamples && burnin != round(burnin)) {
+      stop("Error: Burnin must be an integer number of states.")
   }
 
   logfile <- read.table(filename, sep="\t", header=TRUE, nrows=maxsamples)
   n <- nrow(logfile)
-  logfile <- logfile[floor(burnin*n):n,]
+
+  if (!burninAsSamples) {
+      burnSamples <- floor(burnin*n)
+  } else {
+      burnSamples <- burnin+1
+  }
+
+  if (burnSamples >= n) {
+      stop("Error: Discarding all samples in the log file.")
+  }
+
+  logfile <- logfile[burnSamples:n,]
 
   if (as.mcmc == TRUE) {
       if (is.null(logfile$Sample)) {
@@ -77,15 +97,15 @@ readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
 #' @examples
 #'
 #' @export
-readLog <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE) {
+readLog <- function(filenames, burnin=0.1, maxsamples=-1, as.mcmc=TRUE, burninAsSamples=FALSE) {
 
   if (length(filenames) == 1) {
-      return( readSingleLog(filenames, burnin, maxsamples, as.mcmc) )
+      return( readSingleLog(filenames, burnin, maxsamples, as.mcmc, burninAsSamples) )
   } else {
 
       loglist <- list()
       for (filename in filenames) {
-          loglist[[filename]] <- readSingleLog(filename, burnin, maxsamples, as.mcmc)
+          loglist[[filename]] <- readSingleLog(filename, burnin, maxsamples, as.mcmc, burninAsSamples)
       }
 
       if (as.mcmc == TRUE) {

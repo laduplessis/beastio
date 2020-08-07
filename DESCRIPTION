@@ -1,7 +1,7 @@
 Package: beastio
 Type: Package
 Title: Functions for pre- and post-processing of BEAST and BEAST2 files.
-Version: 0.3.1
+Version: 0.3.2
 Author: Louis du Plessis
 Maintainer: Louis du Plessis <louis.duplessis@zoo.ox.ac.uk>
 Description: This package primarily provides a library of functions for reading

@@ -4,19 +4,31 @@
 \alias{readLog}
 \title{Read BEAST log files}
 \usage{
-readLog(filenames, burnin = 0.1, maxsamples = -1, as.mcmc = TRUE)
+readLog(
+  filenames,
+  burnin = 0.1,
+  maxsamples = -1,
+  as.mcmc = TRUE,
+  burninAsSamples = FALSE
+)
 }
 \arguments{
 \item{filenames}{The name of the log file to read, or aternatively a vector or list of
 input log file names.}
 
-\item{burnin}{Discard this proportion of samples at the start of the chain.}
+\item{burnin}{Discard this proportion of samples at the start of the chain
+(if `burninAsSamples` == FALSE). Otherwise discard this many samples
+at the start of the chain.}
 
 \item{maxsamples}{If > 0 stop after reading in this many lines
 (this option is only for testing and should generally not be used).}
 
 \item{as.mcmc}{If FALSE then return an object of class "data.frame", else
 return an "mcmc" object}
+
+\item{burninAsSamples}{if TRUE burnin is given as the number of samples,
+if FALSE burnin is a proportion (0 <= burnin < 1) of samples.
+(default = FALSE).}
 }
 \value{
 An "mcmc" object (\code{\link[coda]{mcmc}}) or data frame
