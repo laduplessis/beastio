@@ -300,7 +300,7 @@ getSamplingTimes <- function(tree, ...) {
 #' @inheritParams getTreeIntervals
 #' @param ... Extra parameters to pass to \code{\link{getTreeIntervals}}.
 #'
-#' @return A list of times representing the heights of the leaf nodes in
+#' @return A list of times representing the heights of the internal nodes in
 #'         the tree.
 #'
 #' @seealso \code{\link{getTreeIntervals}}, \code{\link[TreeSim]{getx}},
