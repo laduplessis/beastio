@@ -5,6 +5,10 @@
 #       -> No, use coda instead and ignore the BEAST/BEAST2 functions
 #
 
+# require(coda)
+# require(gplots)
+# require(boa)
+
 
 #' Read a single BEAST log file
 #'
@@ -32,11 +36,11 @@
 #'
 readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE, burninAsSamples=FALSE) {
   if (!burninAsSamples && burnin > 1) {
-      stop("Error: Burnin must be a proportion of samples between 0 and 1.")
+      stop("Error: Burnin must be a proportion of samples between 0 and 1.", call. = FALSE)
   }
 
   if (burninAsSamples && burnin != round(burnin)) {
-      stop("Error: Burnin must be an integer number of states.")
+      stop("Error: Burnin must be an integer number of states.", call. = FALSE)
   }
 
   logfile <- read.table(filename, sep="\t", header=TRUE, nrows=maxsamples)
@@ -49,7 +53,7 @@ readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE, bur
   }
 
   if (burnSamples >= n) {
-      stop("Error: Discarding all samples in the log file.")
+      stop("Error: Discarding all samples in the log file.", call. = FALSE)
   }
 
   logfile <- logfile[burnSamples:n,]
@@ -232,7 +236,7 @@ applyMCMC <- function(data, fun=median, ...) {
     return(result)
 
   } else {
-    stop("Error: Not an mcmc or mcmc.list object")
+    stop("Error: Not an mcmc or mcmc.list object", call. = FALSE)
   }
 
 }
@@ -271,7 +275,7 @@ getHPDMedian <- function(data, prob=0.95, ...) {
     return(result)
 
   } else {
-    stop("Error: Not an mcmc or mcmc.list object")
+    stop("Error: Not an mcmc or mcmc.list object", call. = FALSE)
   }
 
 }
@@ -290,6 +294,12 @@ getHPDMedian <- function(data, prob=0.95, ...) {
 #'
 #' @export
 getHPD.boa <- function(data, alpha=0.05, includeMedian=TRUE) {
+
+  if (!requireNamespace("boa", quietly = TRUE)) {
+      stop("Error: Package \"boa\" needed for this function to work. Please install it.",
+           call. = FALSE)
+  }
+
   hpd <- boa::boa.hpd(data, alpha)
   if (includeMedian) {
     med <- median(data)
@@ -370,13 +380,14 @@ constantPars <- function(data) {
               t <- constantParsMCMC(data[[i]])
 
               if (!all.equal(result,t)) {
-                  stop(paste0("Error: Chain ",i," has a different set of constant parameters to chain 1. Possibly some parameters got stuck because of a poor proposal distribution."))
+                  stop(paste0("Error: Chain ",i," has a different set of constant parameters to chain 1. Possibly some parameters got stuck because of a poor proposal distribution."),
+                       call. = FALSE)
               }
           }
       }
       return(result)
   } else {
-      stop("Error: Not an mcmc or mcmc.list object")
+      stop("Error: Not an mcmc or mcmc.list object", call. = FALSE)
   }
 }
 
@@ -412,7 +423,7 @@ effectiveSize <- function(data, normalize=TRUE) {
     return(chain)
   }
 
-  if (is.mcmc.list(data)) {
+  if (coda::is.mcmc.list(data)) {
     data <- lapply(data, normalizeChain)
 
   } else {
@@ -425,33 +436,48 @@ effectiveSize <- function(data, normalize=TRUE) {
 
 #' Plot barplot of ESS values
 #'
-#' @param data   The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
-#' @param ess    Output of running coda::effectiveSize(data) - this is optional and can be supplied
-#'               to save time
-#' @param cutoff The cutoff ESS value (default = 200)
-#' @param title  Title of the plot (x-label)
-#' @param col
+#' @param data    The object containing the MCMC sample - usually of class "mcmc" or "mcmc.list"
+#' @param ess     Output of running coda::effectiveSize(data) - this is optional and can be supplied
+#'                to save time
+#' @param cutoff  The cutoff ESS value for a parameter to be considered stationary (default = 200)
+#' @param title   Title of the plot (x-label)
+#' @param col1    Fill colour used for stationary parameters (ess >= cutoff)
+#' @param col2    Fill colour used for non-stationary parameters (ess < cutoff)
+#' @param border1 Border colour used for stationary parameters (ess >= cutoff)
+#' @param border2 Border colour used for non-stationary parameters and labels (ess < cutoff)
+#' @param labels  Label non-stationary parameters (ess < cutoff)
+#' @param ...     Extra parameters passed to the \code{\link[gplots]{barplot2}}` function
 #'
 #' @export
-plotESS <- function(data, ess=NULL, cutoff=200, title="", col=mPal(dark$blue, 0.5), ...) {
+plotESS <- function(data, ess=NULL, cutoff=200, title="",
+                    col1="gray", col2="red2", border1="black", border2="darkred", labels=TRUE, ...) {
+
+  if (!requireNamespace("gplots", quietly = TRUE)) {
+    stop("Error: Package \"gplots\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
 
   if (is.null(ess)) {
       ess <- effectiveSize(data)
   }
 
   nonstat      <- which(ess < cutoff)
-  col          <- rep(col, length(ess))
-  col[nonstat] <- mPal(dark$red, 0.5)
+  col          <- rep(col1, length(ess))
+  col[nonstat] <- col2
 
-  gplots::barplot2(ess, col=col, names.arg=NA, las=1,
+  border          <- rep(border1, length(ess))
+  border[nonstat] <- border2
+
+
+  gplots::barplot2(ess, col=col, border=border, names.arg=NA, las=1,
                    ylab="ESS", xlab="", ...)
   mtext(side=1, text=title, line=1.5, cex.lab=0.8)
-  abline(h=cutoff, lty=2, col=dark$red, lwd=1)
+  abline(h=cutoff, lty=2, col=border2, lwd=1)
 
-  if (length(nonstat) > 0) {
-    nonstatx <- nonstat*1.2 - 0.5
-    nonstatlab <- paste(names(ess)[nonstat], "=", round(ess[nonstat]))
-    axis(3, at=nonstatx, labels=nonstatlab, pos=cutoff, col.axis=dark$red, lwd=0, las=2, cex.axis=0.8)
+  if (length(nonstat) > 0 && labels) {
+      nonstatx <- nonstat*1.2 - 0.5
+      nonstatlab <- paste(names(ess)[nonstat], "=", round(ess[nonstat]))
+      axis(3, at=nonstatx, labels=nonstatlab, pos=cutoff, col.axis=border2, lwd=0, las=2, cex.axis=0.8)
   }
 }
 
@@ -486,7 +512,7 @@ checkESS <- function(data, cutoff = 200, value = TRUE, ignored = c(), plot=FALSE
           return(which(ess < cutoff))
       }
   } else {
-    stop("Error: Not an mcmc object")
+    stop("Error: Not an mcmc object", call. = FALSE)
   }
   #result <- lapply(lapply(mcmc.trace[, p], effectiveSize), function(x) x[x < 500])
 }

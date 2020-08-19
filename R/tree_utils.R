@@ -38,7 +38,7 @@
 #' @export
 readTreeLog <- function(filename, burnin=0.1) {
   if (burnin > 1) {
-      stop("Error: Burnin must be a proportion of samples between 0 and 1.")
+      stop("Error: Burnin must be a proportion of samples between 0 and 1.", call. = FALSE)
   }
   treesfile <- ape::read.nexus(filename)
   n <- length(treesfile)
@@ -113,7 +113,7 @@ getLineages <- function(types) {
 getTreeIntervals <- function(tree, decreasing=FALSE, raw=FALSE) {
 
   if (!("phylo" %in% class(tree))) {
-    stop("Input tree is not of class \"phylo\".")
+    stop("Input tree is not of class \"phylo\".", call. = FALSE)
   }
 
   # Total number of nodes in the tree
@@ -223,7 +223,7 @@ treeDFSSlow <- function(i, t, treetable) {
 getTreeIntervalsSlow <- function(tree, decreasing=FALSE, raw=FALSE) {
 
   if (!("phylo" %in% class(tree))) {
-    stop("Input tree is not of class \"phylo\".")
+    stop("Input tree is not of class \"phylo\".", call. = FALSE)
   }
 
   # Total number of nodes in the tree

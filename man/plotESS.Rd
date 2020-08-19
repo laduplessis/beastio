@@ -9,7 +9,11 @@ plotESS(
   ess = NULL,
   cutoff = 200,
   title = "",
-  col = mPal(dark$blue, 0.5),
+  col1 = "gray",
+  col2 = "red2",
+  border1 = "black",
+  border2 = "darkred",
+  labels = TRUE,
   ...
 )
 }
@@ -19,11 +23,21 @@ plotESS(
 \item{ess}{Output of running coda::effectiveSize(data) - this is optional and can be supplied
 to save time}
 
-\item{cutoff}{The cutoff ESS value (default = 200)}
+\item{cutoff}{The cutoff ESS value for a parameter to be considered stationary (default = 200)}
 
 \item{title}{Title of the plot (x-label)}
 
-\item{col}{}
+\item{col1}{Fill colour used for stationary parameters (ess >= cutoff)}
+
+\item{col2}{Fill colour used for non-stationary parameters (ess < cutoff)}
+
+\item{border1}{Border colour used for stationary parameters (ess >= cutoff)}
+
+\item{border2}{Border colour used for non-stationary parameters and labels (ess < cutoff)}
+
+\item{labels}{Label non-stationary parameters (ess < cutoff)}
+
+\item{...}{Extra parameters passed to the \code{\link[gplots]{barplot2}}` function}
 }
 \description{
 Plot barplot of ESS values
