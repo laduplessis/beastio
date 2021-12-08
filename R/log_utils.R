@@ -67,6 +67,13 @@ readSingleLog <- function(filename, burnin=0.1, maxsamples=-1, as.mcmc=TRUE, bur
               logfile$state  <- NULL
           }
       }
+    
+      # Sometimes BEAST2 log files have an empty column at the end (lines end in tabs)
+      # This needs to be removed before converting to mcmc object
+      for (i in names(logfile)) {
+           if (all(is.na(logfile[[i]]))) logfile[[i]] <- NULL
+      }
+    
       start <- logfile$Sample[1]
       thin  <- logfile$Sample[2]-logfile$Sample[1]
       rownames(logfile) <- logfile$Sample
